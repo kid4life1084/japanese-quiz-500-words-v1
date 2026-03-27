@@ -1,0 +1,4203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Japanese Vocabulary Quiz — 500 Words</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #1a1a22;
+    --surface2: #22222e;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.15);
+    --accent: #7c6ff7;
+    --accent2: #a598ff;
+    --accent-bg: rgba(124,111,247,0.12);
+    --green: #4ade80;
+    --green-bg: rgba(74,222,128,0.10);
+    --red: #f87171;
+    --red-bg: rgba(248,113,113,0.10);
+    --amber: #fbbf24;
+    --amber-bg: rgba(251,191,36,0.10);
+    --text: #f0f0f8;
+    --text2: #9090a8;
+    --text3: #5a5a78;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: clamp(1rem, 4vw, 2rem) clamp(0.75rem, 4vw, 1.25rem);
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: -40%; left: -20%;
+    width: 80%; height: 80%;
+    background: radial-gradient(ellipse, rgba(124,111,247,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  #app {
+    width: 100%;
+    max-width: 580px;
+    position: relative;
+    margin: 0 auto;
+  }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── START SCREEN ── */
+  .start-logo {
+    text-align: center;
+    margin-bottom: clamp(1.2rem, 4vw, 2rem);
+  }
+  .jp-title {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: clamp(36px, 10vw, 56px);
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent2), #c4b5fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+  .en-title {
+    font-size: clamp(10px, 2.5vw, 13px);
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text2);
+  }
+
+  .start-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(6px, 2vw, 10px);
+    margin-bottom: clamp(0.75rem, 3vw, 1rem);
+  }
+  .stat-pill {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: clamp(8px, 2.5vw, 12px) 8px;
+    text-align: center;
+  }
+  .stat-pill .val { font-size: clamp(16px, 5vw, 22px); font-weight: 700; color: var(--accent2); }
+  .stat-pill .lbl { font-size: clamp(9px, 2.2vw, 11px); color: var(--text2); margin-top: 2px; letter-spacing: 0.05em; }
+
+  .mode-panel, .cat-list {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: clamp(0.75rem, 3vw, 1rem) clamp(0.75rem, 3vw, 1.25rem);
+    margin-bottom: clamp(0.6rem, 2.5vw, 1rem);
+  }
+  .mode-title, .cat-list-title {
+    font-size: clamp(9px, 2.2vw, 11px);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 10px;
+  }
+  .mode-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(6px, 2vw, 10px);
+  }
+  .mode-btn {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: clamp(10px, 3vw, 14px) clamp(6px, 2vw, 10px);
+    cursor: pointer;
+    transition: 0.18s ease;
+    text-align: center;
+    min-height: 56px;
+  }
+  .mode-btn:active { opacity: 0.8; transform: scale(0.97); }
+  .mode-btn.active {
+    background: var(--accent-bg);
+    border-color: rgba(124,111,247,0.35);
+    box-shadow: inset 0 0 0 1px rgba(124,111,247,0.18);
+  }
+  .mode-btn .mode-num {
+    display: block;
+    font-size: clamp(18px, 5vw, 24px);
+    font-weight: 700;
+    color: var(--accent2);
+    line-height: 1;
+  }
+  .mode-btn .mode-lbl {
+    display: block;
+    margin-top: 4px;
+    font-size: clamp(9px, 2.2vw, 11px);
+    color: var(--text2);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .opt-main { display: flex; align-items: center; gap: 10px; }
+  .opt-text { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+  .opt-jp { font-family: 'Noto Sans JP', sans-serif; }
+  .opt-rm { font-size: clamp(9px, 2.2vw, 11px); color: var(--text2); letter-spacing: 0.02em; }
+
+  .cat-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .cat-chip {
+    font-size: clamp(10px, 2.5vw, 12px);
+    background: var(--accent-bg);
+    color: var(--accent2);
+    border: 1px solid rgba(124,111,247,0.2);
+    border-radius: 99px;
+    padding: 3px 10px;
+  }
+
+  .help-line {
+    text-align: center;
+    font-size: clamp(10px, 2.5vw, 12px);
+    color: var(--text3);
+    margin: 8px 0 clamp(0.75rem, 3vw, 1.2rem);
+  }
+
+  .btn-start {
+    width: 100%;
+    padding: clamp(13px, 3.5vw, 16px);
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(14px, 3.5vw, 16px);
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: background 0.2s, transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-start:active { transform: scale(0.98); }
+
+  /* ── QUIZ HEADER ── */
+  .quiz-top {
+    display: flex;
+    align-items: center;
+    gap: clamp(6px, 2vw, 12px);
+    margin-bottom: clamp(0.75rem, 3vw, 1.25rem);
+  }
+  .progress-wrap { flex: 1; min-width: 0; }
+  .progress-nums {
+    display: flex;
+    justify-content: space-between;
+    font-size: clamp(10px, 2.5vw, 12px);
+    color: var(--text2);
+    margin-bottom: 5px;
+  }
+  .progress-track {
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+  .score-badge {
+    background: var(--accent-bg);
+    border: 1px solid rgba(124,111,247,0.2);
+    border-radius: 99px;
+    padding: clamp(3px, 1vw, 4px) clamp(8px, 2.5vw, 12px);
+    font-size: clamp(11px, 2.8vw, 13px);
+    font-weight: 700;
+    color: var(--accent2);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* ── TIMER ── */
+  .timer-row { display: flex; justify-content: center; margin-bottom: clamp(0.6rem, 2.5vw, 1rem); }
+  .timer-ring { position: relative; width: clamp(48px, 12vw, 60px); height: clamp(48px, 12vw, 60px); }
+  .timer-ring svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+  .timer-ring circle { fill: none; stroke-width: 4; }
+  .timer-bg { stroke: var(--surface2); }
+  .timer-track {
+    stroke: var(--accent);
+    stroke-dasharray: 163;
+    stroke-dashoffset: 0;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.1s linear, stroke 0.3s;
+  }
+  .timer-num {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: clamp(14px, 4vw, 18px);
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  /* ── WORD CARD ── */
+  .word-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: clamp(1.25rem, 5vw, 2rem) clamp(0.75rem, 3vw, 1.25rem) clamp(1rem, 4vw, 1.75rem);
+    text-align: center;
+    margin-bottom: clamp(0.6rem, 2.5vw, 1rem);
+    position: relative;
+    overflow: hidden;
+  }
+  .word-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+  .word-cat-tag {
+    display: inline-block;
+    font-size: clamp(9px, 2.2vw, 11px);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 12px;
+  }
+  .word-english {
+    font-size: clamp(24px, 7vw, 42px);
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .word-prompt {
+    font-size: clamp(10px, 2.5vw, 13px);
+    color: var(--text3);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* ── FEEDBACK ── */
+  .feedback-banner {
+    text-align: center;
+    font-size: clamp(12px, 3vw, 15px);
+    font-weight: 500;
+    padding: clamp(8px, 2.5vw, 10px) 12px;
+    border-radius: var(--radius-sm);
+    margin-bottom: clamp(0.6rem, 2.5vw, 1rem);
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+  }
+  .feedback-banner.correct { background: var(--green-bg); color: var(--green); border-color: rgba(74,222,128,0.2); }
+  .feedback-banner.wrong   { background: var(--red-bg);   color: var(--red);   border-color: rgba(248,113,113,0.2); }
+  .feedback-banner.timeout { background: var(--amber-bg); color: var(--amber); border-color: rgba(251,191,36,0.2); }
+
+  /* ── OPTIONS ── */
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(6px, 2vw, 8px);
+  }
+  .opt-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: clamp(12px, 3.5vw, 16px) clamp(6px, 2vw, 10px);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: clamp(16px, 4.5vw, 22px);
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    text-align: center;
+    line-height: 1.3;
+    min-height: clamp(56px, 14vw, 72px);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .opt-btn-inner { display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .opt-num {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(9px, 2.2vw, 11px);
+    font-weight: 700;
+    color: var(--text3);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    min-width: 18px;
+    height: 18px;
+    line-height: 18px;
+    text-align: center;
+    padding: 0 4px;
+    flex-shrink: 0;
+  }
+  .opt-btn.correct .opt-num { color: var(--green); border-color: rgba(74,222,128,0.4); background: transparent; }
+  .opt-btn.wrong .opt-num   { color: var(--red);   border-color: rgba(248,113,113,0.4); background: transparent; }
+  .opt-btn:active:not(:disabled) { transform: scale(0.96); }
+  .opt-btn:disabled { cursor: default; }
+  .opt-btn.correct { background: var(--green-bg); border-color: rgba(74,222,128,0.4); color: var(--green); font-weight: 700; }
+  .opt-btn.wrong   { background: var(--red-bg);   border-color: rgba(248,113,113,0.4); color: var(--red); }
+
+  .kbd-tip {
+    text-align: center;
+    margin-top: 10px;
+    font-size: clamp(9px, 2.2vw, 11px);
+    color: var(--text3);
+    letter-spacing: 0.05em;
+  }
+  kbd {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(8px, 2vw, 10px);
+  }
+
+  /* ── RESULTS ── */
+  .result-hero {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: clamp(1.5rem, 5vw, 2.5rem) clamp(1rem, 4vw, 1.5rem);
+    text-align: center;
+    margin-bottom: clamp(0.75rem, 3vw, 1.25rem);
+    position: relative;
+    overflow: hidden;
+  }
+  .result-hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+  .result-jp { font-family: 'Noto Sans JP', sans-serif; font-size: clamp(11px, 2.8vw, 14px); color: var(--text3); margin-bottom: 8px; letter-spacing: 0.1em; }
+  .result-score {
+    font-size: clamp(48px, 14vw, 72px);
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent2), #c4b5fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+  }
+  .result-denom { font-size: clamp(14px, 4vw, 20px); color: var(--text2); margin-bottom: 1rem; }
+  .result-pct   { font-size: clamp(20px, 6vw, 28px); font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .result-msg   { font-size: clamp(11px, 2.8vw, 14px); color: var(--text2); }
+
+  .result-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: clamp(6px, 2vw, 8px); margin-bottom: clamp(0.75rem, 3vw, 1.25rem); }
+  .rstat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: clamp(8px, 2.5vw, 10px) 8px; text-align: center; }
+  .rstat .rv { font-size: clamp(16px, 4.5vw, 20px); font-weight: 700; }
+  .rstat .rl  { font-size: clamp(9px, 2.2vw, 11px); color: var(--text2); margin-top: 2px; }
+  .rstat.green .rv { color: var(--green); }
+  .rstat.red .rv   { color: var(--red); }
+  .rstat.amber .rv { color: var(--amber); }
+
+  .breakdown {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: clamp(0.75rem, 3vw, 1.25rem);
+  }
+  .breakdown-header {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: clamp(9px, 2.2vw, 12px);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text3);
+  }
+  .bd-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: clamp(8px, 2.5vw, 10px) 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: clamp(11px, 2.8vw, 13px);
+  }
+  .bd-row:last-child { border-bottom: none; }
+  .bd-jp { font-family: 'Noto Sans JP', sans-serif; font-size: clamp(14px, 4vw, 18px); min-width: 52px; }
+  .bd-en { flex: 1; color: var(--text2); }
+  .bd-mark { font-size: clamp(9px, 2.2vw, 11px); font-weight: 700; padding: 2px 8px; border-radius: 99px; }
+  .bd-mark.w { background: var(--red-bg);   color: var(--red); }
+  .bd-mark.t { background: var(--amber-bg); color: var(--amber); }
+
+  /* ── SPEAKING MODE MIC ── */
+  #sp-mic-btn.listening {
+    background: #ef4444 !important;
+    animation: sp-mic-pulse 1s ease-in-out infinite;
+  }
+  #sp-mic-btn.success { background: #22c55e !important; animation: none; }
+  #sp-mic-btn.fail    { background: #f59e0b !important; animation: none; }
+  #sp-mic-btn:disabled { opacity: 0.4; pointer-events: none; }
+  @keyframes sp-mic-pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.5); }
+    50%      { box-shadow: 0 0 0 20px rgba(239,68,68,0); }
+  }
+
+  /* ── RESPONSIVE BREAKPOINTS ── */
+
+  /* Small phones (< 380px) */
+  @media (max-width: 380px) {
+    .mode-grid { grid-template-columns: 1fr 1fr; }
+    .start-stats { grid-template-columns: repeat(3, 1fr); }
+    .options-grid { grid-template-columns: 1fr; }
+    .quiz-top { gap: 6px; }
+    .kbd-tip { display: none; }
+    #sp-mic-btn { width: 72px !important; height: 72px !important; font-size: 2rem !important; }
+  }
+
+  /* Standard phones (380px – 560px) */
+  @media (max-width: 560px) {
+    .options-grid { grid-template-columns: 1fr 1fr; }
+    .result-grid  { grid-template-columns: repeat(3, 1fr); }
+    .kbd-tip { display: none; }
+  }
+
+  /* Tablet and up (> 600px) — comfortable reading */
+  @media (min-width: 600px) {
+    .options-grid { grid-template-columns: 1fr 1fr; }
+    .opt-btn { font-size: clamp(18px, 3vw, 24px); }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="start-screen" class="screen active">
+    <div class="start-logo">
+      <div class="jp-title">日本語</div>
+      <div class="en-title">English → Japanese Quiz</div>
+    </div>
+
+    <div class="start-stats">
+      <div class="stat-pill"><div class="val">500</div><div class="lbl">Total Words</div></div>
+      <div class="stat-pill"><div class="val">5s</div><div class="lbl">Per Word</div></div>
+      <div class="stat-pill"><div class="val">4</div><div class="lbl">Choices</div></div>
+    </div>
+
+    <div class="mode-panel">
+      <div class="mode-title">Quiz Mode</div>
+      <div class="mode-grid">
+        <button class="mode-btn" data-count="20" onclick="setMode(20)">
+          <span class="mode-num">20</span>
+          <span class="mode-lbl">Quick</span>
+        </button>
+        <button class="mode-btn active" data-count="50" onclick="setMode(50)">
+          <span class="mode-num">50</span>
+          <span class="mode-lbl">Standard</span>
+        </button>
+        <button class="mode-btn" data-count="100" onclick="setMode(100)">
+          <span class="mode-num">100</span>
+          <span class="mode-lbl">Marathon</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="mode-panel">
+      <div class="mode-title">Romaji</div>
+      <div class="mode-grid" style="grid-template-columns: repeat(2, 1fr);">
+        <button class="mode-btn active" data-romaji="off" onclick="setRomaji(false)">
+          <span class="mode-num" style="font-size:18px;">Off</span>
+          <span class="mode-lbl">Japanese Only</span>
+        </button>
+        <button class="mode-btn" data-romaji="on" onclick="setRomaji(true)">
+          <span class="mode-num" style="font-size:18px;">On</span>
+          <span class="mode-lbl">Show Romaji</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="mode-panel">
+      <div class="mode-title">Quiz Type</div>
+      <div class="mode-grid" style="grid-template-columns: repeat(2, 1fr);">
+        <button class="mode-btn active" data-qtype="multiple" onclick="setQuizType('multiple')">
+          <span class="mode-num" style="font-size:18px;">&#x1F4DD;</span>
+          <span class="mode-lbl">Multiple Choice</span>
+        </button>
+        <button class="mode-btn" data-qtype="speaking" onclick="setQuizType('speaking')">
+          <span class="mode-num" style="font-size:18px;">&#x1F3A4;</span>
+          <span class="mode-lbl">Speaking</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="cat-list">
+      <div class="cat-list-title">Included Categories</div>
+      <div class="cat-chips">
+        <span class="cat-chip">Abstract words</span>
+        <span class="cat-chip">Additional daily life verbs</span>
+        <span class="cat-chip">Adjectives</span>
+        <span class="cat-chip">Advanced everyday words</span>
+        <span class="cat-chip">Connectors &amp; grammar</span>
+        <span class="cat-chip">Conversation expressions</span>
+        <span class="cat-chip">Core words</span>
+        <span class="cat-chip">Daily life verbs</span>
+        <span class="cat-chip">Describing people</span>
+        <span class="cat-chip">Describing situations</span>
+        <span class="cat-chip">Direction &amp; position</span>
+        <span class="cat-chip">Everyday actions</span>
+        <span class="cat-chip">Everyday useful verbs</span>
+        <span class="cat-chip">Feelings &amp; states</span>
+        <span class="cat-chip">Business &amp; society</span>
+        <span class="cat-chip">Modern katakana</span>
+        <span class="cat-chip">Opinion &amp; communication</span>
+        <span class="cat-chip">Practical everyday verbs</span>
+        <span class="cat-chip">Thinking &amp; abstract words</span>
+      </div>
+    </div>
+
+    <div class="help-line" id="help-line">Questions are mixed randomly from all 500 words. Romaji is currently off.</div>
+    <button class="btn-start" onclick="startQuiz()">Begin Quiz</button>
+  </div>
+
+  <div id="quiz-screen" class="screen">
+    <div class="quiz-top">
+      <button onclick="showScreen('start-screen')" style="background:var(--surface2);border:1px solid var(--border);color:var(--text2);border-radius:var(--radius-sm);padding:clamp(6px,2vw,8px) clamp(10px,3vw,14px);font-family:'Inter',sans-serif;font-size:clamp(11px,2.5vw,13px);font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;min-height:36px;" title="Back to menu">&#x2190; Menu</button>
+      <div class="progress-wrap">
+        <div class="progress-nums">
+          <span id="prog-label">0 / 50</span>
+          <span id="prog-cat" style="color:var(--text3);font-size:11px;"></span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="prog-bar" style="width:0%"></div></div>
+      </div>
+      <div class="score-badge" id="score-badge">0 pts</div>
+    </div>
+
+    <div class="timer-row">
+      <div class="timer-ring">
+        <svg width="60" height="60" viewBox="0 0 60 60">
+          <circle class="timer-bg" cx="30" cy="30" r="26"></circle>
+          <circle class="timer-track" id="timer-track" cx="30" cy="30" r="26"></circle>
+        </svg>
+        <div class="timer-num" id="timer-num">5</div>
+      </div>
+    </div>
+
+    <div class="word-card">
+      <div class="word-cat-tag" id="word-cat"></div>
+      <div class="word-english" id="word-en"></div>
+      <div class="word-prompt">Select the Japanese word</div>
+    </div>
+
+    <div class="feedback-banner" id="feedback"></div>
+    <div class="options-grid" id="options-grid"></div>
+
+    <div class="kbd-tip">Press <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> to select an answer</div>
+  </div>
+
+  <div id="result-screen" class="screen">
+    <div class="result-hero">
+      <div class="result-jp">結果</div>
+      <div class="result-score" id="final-score">0</div>
+      <div class="result-denom" id="result-denom">out of 50</div>
+      <div class="result-pct" id="final-pct">0%</div>
+      <div class="result-msg" id="result-msg"></div>
+    </div>
+
+    <div class="result-grid">
+      <div class="rstat green"><div class="rv" id="rs-correct">0</div><div class="rl">Correct</div></div>
+      <div class="rstat red"><div class="rv" id="rs-wrong">0</div><div class="rl">Wrong</div></div>
+      <div class="rstat amber"><div class="rv" id="rs-timeout">0</div><div class="rl">Timed Out</div></div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-bottom:1.25rem;">
+      <button class="btn-start" onclick="showScreen('start-screen')" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);flex:0 0 auto;padding:16px 20px;">&#x2190; Menu</button>
+      <button class="btn-start" onclick="startQuiz()" style="flex:1;">Play Again</button>
+    </div>
+    <div class="breakdown" id="breakdown"></div>
+  </div>
+</div>
+
+  <!-- SPEAKING SCREEN -->
+  <div id="speaking-screen" class="screen">
+    <div class="quiz-top">
+      <button onclick="if(spRecog){try{spRecog.stop();}catch(e){}}showScreen('start-screen')" style="background:var(--surface2);border:1px solid var(--border);color:var(--text2);border-radius:var(--radius-sm);padding:clamp(6px,2vw,8px) clamp(10px,3vw,14px);font-family:'Inter',sans-serif;font-size:clamp(11px,2.5vw,13px);font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;min-height:36px;" title="Back to menu">&#x2190; Menu</button>
+      <div class="progress-wrap">
+        <div class="progress-nums">
+          <span id="sp-prog-label">0 / 20</span>
+          <span id="sp-prog-cat" style="color:var(--text3);font-size:11px;"></span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="sp-prog-bar" style="width:0%"></div></div>
+      </div>
+      <div class="score-badge" id="sp-score-badge">0 pts</div>
+    </div>
+
+    <div class="word-card" style="text-align:center;">
+      <div class="word-cat-tag" id="sp-word-cat"></div>
+      <div style="font-family:'Noto Sans JP',sans-serif; font-size: clamp(32px,10vw,64px); font-weight:700; color:var(--text); margin-bottom:8px; line-height:1.2;" id="sp-word-jp"></div>
+      <div id="sp-word-rm" style="font-size:16px; color:var(--text2); margin-bottom:6px; min-height:24px;"></div>
+      <div class="word-prompt" id="sp-word-en" style="font-size:clamp(16px,4vw,24px); color:var(--text2); font-weight:600; text-transform:none; letter-spacing:0;"></div>
+    </div>
+
+    <div class="feedback-banner" id="sp-feedback" style="min-height:52px; font-size:14px;"></div>
+
+    <!-- Mic button -->
+    <div style="display:flex; flex-direction:column; align-items:center; gap:12px; margin-top:4px; width:100%;">
+      <button id="sp-mic-btn" onclick="spOnMicTap()" style="
+        width:clamp(72px,18vw,90px); height:clamp(72px,18vw,90px); border-radius:50%;
+        background:var(--accent); border:none; color:#fff;
+        font-size:clamp(1.8rem,6vw,2.4rem); cursor:pointer;
+        box-shadow: 0 4px 24px rgba(124,111,247,0.4);
+        transition: background 0.2s, transform 0.12s;
+        display:flex; align-items:center; justify-content:center;
+      ">&#x1F3A4;</button>
+      <div id="sp-heard-text" style="font-size:13px; color:var(--text2); font-style:italic; min-height:20px; text-align:center;"></div>
+      <div id="sp-attempt-info" style="font-size:12px; color:var(--text3); min-height:18px;"></div>
+      <!-- Small skip for parent -->
+      <button id="sp-skip-btn" onclick="spParentSkip()" style="
+        opacity:0; pointer-events:none;
+        background:none; border:1px solid var(--border2);
+        color:var(--text2); font-family:'Inter',sans-serif;
+        font-size:12px; padding:6px 18px; border-radius:99px; cursor:pointer;
+        transition: opacity 0.3s;
+      ">&#x1F464; I said it (parent override)</button>
+    </div>
+  </div>
+
+
+<script>
+const WORDS = [
+  {
+    "jp": "はい",
+    "rm": "hai",
+    "en": "yes",
+    "cat": "Core words"
+  },
+  {
+    "jp": "いいえ",
+    "rm": "iie",
+    "en": "no",
+    "cat": "Core words"
+  },
+  {
+    "jp": "これ",
+    "rm": "kore",
+    "en": "this",
+    "cat": "Core words"
+  },
+  {
+    "jp": "それ",
+    "rm": "sore",
+    "en": "that (near listener)",
+    "cat": "Core words"
+  },
+  {
+    "jp": "あれ",
+    "rm": "are",
+    "en": "that (over there)",
+    "cat": "Core words"
+  },
+  {
+    "jp": "ここ",
+    "rm": "koko",
+    "en": "here",
+    "cat": "Core words"
+  },
+  {
+    "jp": "そこ",
+    "rm": "soko",
+    "en": "there",
+    "cat": "Core words"
+  },
+  {
+    "jp": "あそこ",
+    "rm": "asoko",
+    "en": "over there",
+    "cat": "Core words"
+  },
+  {
+    "jp": "誰",
+    "rm": "dare",
+    "en": "who",
+    "cat": "Core words"
+  },
+  {
+    "jp": "何",
+    "rm": "nani",
+    "en": "what",
+    "cat": "Core words"
+  },
+  {
+    "jp": "私",
+    "rm": "watashi",
+    "en": "I / me",
+    "cat": "People"
+  },
+  {
+    "jp": "あなた",
+    "rm": "anata",
+    "en": "you",
+    "cat": "People"
+  },
+  {
+    "jp": "人",
+    "rm": "hito",
+    "en": "person",
+    "cat": "People"
+  },
+  {
+    "jp": "友達",
+    "rm": "tomodachi",
+    "en": "friend",
+    "cat": "People"
+  },
+  {
+    "jp": "先生",
+    "rm": "sensei",
+    "en": "teacher",
+    "cat": "People"
+  },
+  {
+    "jp": "学生",
+    "rm": "gakusei",
+    "en": "student",
+    "cat": "People"
+  },
+  {
+    "jp": "子ども",
+    "rm": "kodomo",
+    "en": "child",
+    "cat": "People"
+  },
+  {
+    "jp": "大人",
+    "rm": "otona",
+    "en": "adult",
+    "cat": "People"
+  },
+  {
+    "jp": "家族",
+    "rm": "kazoku",
+    "en": "family",
+    "cat": "People"
+  },
+  {
+    "jp": "名前",
+    "rm": "namae",
+    "en": "name",
+    "cat": "People"
+  },
+  {
+    "jp": "行く",
+    "rm": "iku",
+    "en": "go",
+    "cat": "Verbs"
+  },
+  {
+    "jp": "来る",
+    "rm": "kuru",
+    "en": "come",
+    "cat": "Verbs"
+  },
+  {
+    "jp": "帰る",
+    "rm": "kaeru",
+    "en": "return / go home",
+    "cat": "Verbs"
+  },
+  {
+    "jp": "食べる",
+    "rm": "taberu",
+    "en": "eat",
+    "cat": "Verbs"
+  },
+  {
+    "jp": "飲む",
+    "rm": "nomu",
+    "en": "drink",
+    "cat": "Verbs"
+  },
+  {
+    "jp": "見る",
+    "rm": "miru",
+    "en": "see / watch",
+    "cat": "Verbs"
+  },
+  {
+    "jp": "聞く",
+    "rm": "kiku",
+    "en": "listen / ask",
+    "cat": "Verbs"
+  },
+  {
+    "jp": "話す",
+    "rm": "hanasu",
+    "en": "speak",
+    "cat": "Verbs"
+  },
+  {
+    "jp": "読む",
+    "rm": "yomu",
+    "en": "read",
+    "cat": "Verbs"
+  },
+  {
+    "jp": "書く",
+    "rm": "kaku",
+    "en": "write",
+    "cat": "Verbs"
+  },
+  {
+    "jp": "買う",
+    "rm": "kau",
+    "en": "buy",
+    "cat": "Verbs"
+  },
+  {
+    "jp": "使う",
+    "rm": "tsukau",
+    "en": "use",
+    "cat": "Verbs"
+  },
+  {
+    "jp": "する",
+    "rm": "suru",
+    "en": "do",
+    "cat": "Verbs"
+  },
+  {
+    "jp": "ある",
+    "rm": "aru",
+    "en": "exist (things)",
+    "cat": "Verbs"
+  },
+  {
+    "jp": "いる",
+    "rm": "iru",
+    "en": "exist (people/animals)",
+    "cat": "Verbs"
+  },
+  {
+    "jp": "いい",
+    "rm": "ii",
+    "en": "good",
+    "cat": "Adjectives"
+  },
+  {
+    "jp": "悪い",
+    "rm": "warui",
+    "en": "bad",
+    "cat": "Adjectives"
+  },
+  {
+    "jp": "大きい",
+    "rm": "ookii",
+    "en": "big",
+    "cat": "Adjectives"
+  },
+  {
+    "jp": "小さい",
+    "rm": "chiisai",
+    "en": "small",
+    "cat": "Adjectives"
+  },
+  {
+    "jp": "新しい",
+    "rm": "atarashii",
+    "en": "new",
+    "cat": "Adjectives"
+  },
+  {
+    "jp": "古い",
+    "rm": "furui",
+    "en": "old",
+    "cat": "Adjectives"
+  },
+  {
+    "jp": "高い",
+    "rm": "takai",
+    "en": "expensive / tall",
+    "cat": "Adjectives"
+  },
+  {
+    "jp": "安い",
+    "rm": "yasui",
+    "en": "cheap",
+    "cat": "Adjectives"
+  },
+  {
+    "jp": "熱い",
+    "rm": "atsui",
+    "en": "hot",
+    "cat": "Adjectives"
+  },
+  {
+    "jp": "冷たい",
+    "rm": "tsumetai",
+    "en": "cold (to touch)",
+    "cat": "Adjectives"
+  },
+  {
+    "jp": "今日",
+    "rm": "kyou",
+    "en": "today",
+    "cat": "Time"
+  },
+  {
+    "jp": "明日",
+    "rm": "ashita",
+    "en": "tomorrow",
+    "cat": "Time"
+  },
+  {
+    "jp": "昨日",
+    "rm": "kinou",
+    "en": "yesterday",
+    "cat": "Time"
+  },
+  {
+    "jp": "今",
+    "rm": "ima",
+    "en": "now",
+    "cat": "Time"
+  },
+  {
+    "jp": "朝",
+    "rm": "asa",
+    "en": "morning",
+    "cat": "Time"
+  },
+  {
+    "jp": "昼",
+    "rm": "hiru",
+    "en": "noon / daytime",
+    "cat": "Time"
+  },
+  {
+    "jp": "夜",
+    "rm": "yoru",
+    "en": "night",
+    "cat": "Time"
+  },
+  {
+    "jp": "時",
+    "rm": "ji",
+    "en": "hour / time",
+    "cat": "Time"
+  },
+  {
+    "jp": "分",
+    "rm": "fun",
+    "en": "minute",
+    "cat": "Time"
+  },
+  {
+    "jp": "週",
+    "rm": "shuu",
+    "en": "week",
+    "cat": "Time"
+  },
+  {
+    "jp": "年",
+    "rm": "nen",
+    "en": "year",
+    "cat": "Time"
+  },
+  {
+    "jp": "月",
+    "rm": "tsuki",
+    "en": "month / moon",
+    "cat": "Time"
+  },
+  {
+    "jp": "家",
+    "rm": "ie",
+    "en": "house / home",
+    "cat": "Places"
+  },
+  {
+    "jp": "学校",
+    "rm": "gakkou",
+    "en": "school",
+    "cat": "Places"
+  },
+  {
+    "jp": "会社",
+    "rm": "kaisha",
+    "en": "company",
+    "cat": "Places"
+  },
+  {
+    "jp": "店",
+    "rm": "mise",
+    "en": "shop",
+    "cat": "Places"
+  },
+  {
+    "jp": "駅",
+    "rm": "eki",
+    "en": "station",
+    "cat": "Places"
+  },
+  {
+    "jp": "病院",
+    "rm": "byouin",
+    "en": "hospital",
+    "cat": "Places"
+  },
+  {
+    "jp": "銀行",
+    "rm": "ginkou",
+    "en": "bank",
+    "cat": "Places"
+  },
+  {
+    "jp": "町",
+    "rm": "machi",
+    "en": "town",
+    "cat": "Places"
+  },
+  {
+    "jp": "日本",
+    "rm": "nihon",
+    "en": "Japan",
+    "cat": "Places"
+  },
+  {
+    "jp": "入口",
+    "rm": "iriguchi",
+    "en": "entrance",
+    "cat": "Places"
+  },
+  {
+    "jp": "水",
+    "rm": "mizu",
+    "en": "water",
+    "cat": "Food & drink"
+  },
+  {
+    "jp": "お茶",
+    "rm": "ocha",
+    "en": "tea",
+    "cat": "Food & drink"
+  },
+  {
+    "jp": "ご飯",
+    "rm": "gohan",
+    "en": "rice / meal",
+    "cat": "Food & drink"
+  },
+  {
+    "jp": "パン",
+    "rm": "pan",
+    "en": "bread",
+    "cat": "Food & drink"
+  },
+  {
+    "jp": "肉",
+    "rm": "niku",
+    "en": "meat",
+    "cat": "Food & drink"
+  },
+  {
+    "jp": "魚",
+    "rm": "sakana",
+    "en": "fish",
+    "cat": "Food & drink"
+  },
+  {
+    "jp": "野菜",
+    "rm": "yasai",
+    "en": "vegetables",
+    "cat": "Food & drink"
+  },
+  {
+    "jp": "果物",
+    "rm": "kudamono",
+    "en": "fruit",
+    "cat": "Food & drink"
+  },
+  {
+    "jp": "一",
+    "rm": "ichi",
+    "en": "one",
+    "cat": "Numbers"
+  },
+  {
+    "jp": "二",
+    "rm": "ni",
+    "en": "two",
+    "cat": "Numbers"
+  },
+  {
+    "jp": "三",
+    "rm": "san",
+    "en": "three",
+    "cat": "Numbers"
+  },
+  {
+    "jp": "四",
+    "rm": "yon",
+    "en": "four",
+    "cat": "Numbers"
+  },
+  {
+    "jp": "五",
+    "rm": "go",
+    "en": "five",
+    "cat": "Numbers"
+  },
+  {
+    "jp": "六",
+    "rm": "roku",
+    "en": "six",
+    "cat": "Numbers"
+  },
+  {
+    "jp": "七",
+    "rm": "nana",
+    "en": "seven",
+    "cat": "Numbers"
+  },
+  {
+    "jp": "八",
+    "rm": "hachi",
+    "en": "eight",
+    "cat": "Numbers"
+  },
+  {
+    "jp": "九",
+    "rm": "kyuu",
+    "en": "nine",
+    "cat": "Numbers"
+  },
+  {
+    "jp": "十",
+    "rm": "juu",
+    "en": "ten",
+    "cat": "Numbers"
+  },
+  {
+    "jp": "コーヒー",
+    "rm": "koohii",
+    "en": "coffee",
+    "cat": "Katakana"
+  },
+  {
+    "jp": "ティー",
+    "rm": "tii",
+    "en": "tea (loanword)",
+    "cat": "Katakana"
+  },
+  {
+    "jp": "ジュース",
+    "rm": "juusu",
+    "en": "juice",
+    "cat": "Katakana"
+  },
+  {
+    "jp": "ビール",
+    "rm": "biiru",
+    "en": "beer",
+    "cat": "Katakana"
+  },
+  {
+    "jp": "レストラン",
+    "rm": "resutoran",
+    "en": "restaurant",
+    "cat": "Katakana"
+  },
+  {
+    "jp": "ホテル",
+    "rm": "hoteru",
+    "en": "hotel",
+    "cat": "Katakana"
+  },
+  {
+    "jp": "タクシー",
+    "rm": "takushii",
+    "en": "taxi",
+    "cat": "Katakana"
+  },
+  {
+    "jp": "バス",
+    "rm": "basu",
+    "en": "bus",
+    "cat": "Katakana"
+  },
+  {
+    "jp": "トイレ",
+    "rm": "toire",
+    "en": "toilet",
+    "cat": "Katakana"
+  },
+  {
+    "jp": "スーパー",
+    "rm": "suupaa",
+    "en": "supermarket",
+    "cat": "Katakana"
+  },
+  {
+    "jp": "コンビニ",
+    "rm": "konbini",
+    "en": "convenience store",
+    "cat": "Katakana"
+  },
+  {
+    "jp": "メニュー",
+    "rm": "menyuu",
+    "en": "menu",
+    "cat": "Katakana"
+  },
+  {
+    "jp": "スマホ",
+    "rm": "sumaho",
+    "en": "smartphone",
+    "cat": "Katakana"
+  },
+  {
+    "jp": "カード",
+    "rm": "kaado",
+    "en": "card",
+    "cat": "Katakana"
+  },
+  {
+    "jp": "カメラ",
+    "rm": "kamera",
+    "en": "camera",
+    "cat": "Katakana"
+  },
+  {
+    "jp": "起きる",
+    "rm": "okiru",
+    "en": "wake up",
+    "cat": "Daily life verbs"
+  },
+  {
+    "jp": "寝る",
+    "rm": "neru",
+    "en": "sleep",
+    "cat": "Daily life verbs"
+  },
+  {
+    "jp": "働く",
+    "rm": "hataraku",
+    "en": "work",
+    "cat": "Daily life verbs"
+  },
+  {
+    "jp": "休む",
+    "rm": "yasumu",
+    "en": "rest / take a break",
+    "cat": "Daily life verbs"
+  },
+  {
+    "jp": "歩く",
+    "rm": "aruku",
+    "en": "walk",
+    "cat": "Daily life verbs"
+  },
+  {
+    "jp": "走る",
+    "rm": "hashiru",
+    "en": "run",
+    "cat": "Daily life verbs"
+  },
+  {
+    "jp": "座る",
+    "rm": "suwaru",
+    "en": "sit",
+    "cat": "Daily life verbs"
+  },
+  {
+    "jp": "立つ",
+    "rm": "tatsu",
+    "en": "stand",
+    "cat": "Daily life verbs"
+  },
+  {
+    "jp": "開ける",
+    "rm": "akeru",
+    "en": "open (something)",
+    "cat": "Daily life verbs"
+  },
+  {
+    "jp": "閉める",
+    "rm": "shimeru",
+    "en": "close (something)",
+    "cat": "Daily life verbs"
+  },
+  {
+    "jp": "始める",
+    "rm": "hajimeru",
+    "en": "start",
+    "cat": "Daily life verbs"
+  },
+  {
+    "jp": "終わる",
+    "rm": "owaru",
+    "en": "finish",
+    "cat": "Daily life verbs"
+  },
+  {
+    "jp": "手伝う",
+    "rm": "tetsudau",
+    "en": "help",
+    "cat": "Daily life verbs"
+  },
+  {
+    "jp": "待つ",
+    "rm": "matsu",
+    "en": "wait",
+    "cat": "Daily life verbs"
+  },
+  {
+    "jp": "持つ",
+    "rm": "motsu",
+    "en": "hold / carry",
+    "cat": "Daily life verbs"
+  },
+  {
+    "jp": "取る",
+    "rm": "toru",
+    "en": "take",
+    "cat": "Daily life verbs"
+  },
+  {
+    "jp": "置く",
+    "rm": "oku",
+    "en": "put / place",
+    "cat": "Daily life verbs"
+  },
+  {
+    "jp": "入る",
+    "rm": "hairu",
+    "en": "enter",
+    "cat": "Daily life verbs"
+  },
+  {
+    "jp": "出る",
+    "rm": "deru",
+    "en": "exit",
+    "cat": "Daily life verbs"
+  },
+  {
+    "jp": "作る",
+    "rm": "tsukuru",
+    "en": "make",
+    "cat": "Daily life verbs"
+  },
+  {
+    "jp": "楽しい",
+    "rm": "tanoshii",
+    "en": "fun",
+    "cat": "Useful adjectives"
+  },
+  {
+    "jp": "嬉しい",
+    "rm": "ureshii",
+    "en": "happy",
+    "cat": "Useful adjectives"
+  },
+  {
+    "jp": "悲しい",
+    "rm": "kanashii",
+    "en": "sad",
+    "cat": "Useful adjectives"
+  },
+  {
+    "jp": "忙しい",
+    "rm": "isogashii",
+    "en": "busy",
+    "cat": "Useful adjectives"
+  },
+  {
+    "jp": "暑い",
+    "rm": "atsui",
+    "en": "hot (weather)",
+    "cat": "Useful adjectives"
+  },
+  {
+    "jp": "寒い",
+    "rm": "samui",
+    "en": "cold (weather)",
+    "cat": "Useful adjectives"
+  },
+  {
+    "jp": "強い",
+    "rm": "tsuyoi",
+    "en": "strong",
+    "cat": "Useful adjectives"
+  },
+  {
+    "jp": "弱い",
+    "rm": "yowai",
+    "en": "weak",
+    "cat": "Useful adjectives"
+  },
+  {
+    "jp": "早い",
+    "rm": "hayai",
+    "en": "early / fast",
+    "cat": "Useful adjectives"
+  },
+  {
+    "jp": "遅い",
+    "rm": "osoi",
+    "en": "slow / late",
+    "cat": "Useful adjectives"
+  },
+  {
+    "jp": "難しい",
+    "rm": "muzukashii",
+    "en": "difficult",
+    "cat": "Useful adjectives"
+  },
+  {
+    "jp": "簡単",
+    "rm": "kantan",
+    "en": "easy",
+    "cat": "Useful adjectives"
+  },
+  {
+    "jp": "きれい",
+    "rm": "kirei",
+    "en": "beautiful / clean",
+    "cat": "Useful adjectives"
+  },
+  {
+    "jp": "元気",
+    "rm": "genki",
+    "en": "healthy / energetic",
+    "cat": "Useful adjectives"
+  },
+  {
+    "jp": "便利",
+    "rm": "benri",
+    "en": "convenient",
+    "cat": "Useful adjectives"
+  },
+  {
+    "jp": "父",
+    "rm": "chichi",
+    "en": "father (my)",
+    "cat": "People & relationships"
+  },
+  {
+    "jp": "母",
+    "rm": "haha",
+    "en": "mother (my)",
+    "cat": "People & relationships"
+  },
+  {
+    "jp": "兄",
+    "rm": "ani",
+    "en": "older brother (my)",
+    "cat": "People & relationships"
+  },
+  {
+    "jp": "姉",
+    "rm": "ane",
+    "en": "older sister (my)",
+    "cat": "People & relationships"
+  },
+  {
+    "jp": "弟",
+    "rm": "otouto",
+    "en": "younger brother",
+    "cat": "People & relationships"
+  },
+  {
+    "jp": "妹",
+    "rm": "imouto",
+    "en": "younger sister",
+    "cat": "People & relationships"
+  },
+  {
+    "jp": "夫",
+    "rm": "otto",
+    "en": "husband",
+    "cat": "People & relationships"
+  },
+  {
+    "jp": "妻",
+    "rm": "tsuma",
+    "en": "wife",
+    "cat": "People & relationships"
+  },
+  {
+    "jp": "両親",
+    "rm": "ryoushin",
+    "en": "parents",
+    "cat": "People & relationships"
+  },
+  {
+    "jp": "友人",
+    "rm": "yuujin",
+    "en": "friend (formal)",
+    "cat": "People & relationships"
+  },
+  {
+    "jp": "部屋",
+    "rm": "heya",
+    "en": "room",
+    "cat": "Home & objects"
+  },
+  {
+    "jp": "机",
+    "rm": "tsukue",
+    "en": "desk",
+    "cat": "Home & objects"
+  },
+  {
+    "jp": "椅子",
+    "rm": "isu",
+    "en": "chair",
+    "cat": "Home & objects"
+  },
+  {
+    "jp": "本",
+    "rm": "hon",
+    "en": "book",
+    "cat": "Home & objects"
+  },
+  {
+    "jp": "電話",
+    "rm": "denwa",
+    "en": "telephone",
+    "cat": "Home & objects"
+  },
+  {
+    "jp": "時計",
+    "rm": "tokei",
+    "en": "clock / watch",
+    "cat": "Home & objects"
+  },
+  {
+    "jp": "鍵",
+    "rm": "kagi",
+    "en": "key",
+    "cat": "Home & objects"
+  },
+  {
+    "jp": "車",
+    "rm": "kuruma",
+    "en": "car",
+    "cat": "Home & objects"
+  },
+  {
+    "jp": "自転車",
+    "rm": "jitensha",
+    "en": "bicycle",
+    "cat": "Home & objects"
+  },
+  {
+    "jp": "服",
+    "rm": "fuku",
+    "en": "clothes",
+    "cat": "Home & objects"
+  },
+  {
+    "jp": "上",
+    "rm": "ue",
+    "en": "above",
+    "cat": "Direction & position"
+  },
+  {
+    "jp": "下",
+    "rm": "shita",
+    "en": "below",
+    "cat": "Direction & position"
+  },
+  {
+    "jp": "前",
+    "rm": "mae",
+    "en": "front / before",
+    "cat": "Direction & position"
+  },
+  {
+    "jp": "後ろ",
+    "rm": "ushiro",
+    "en": "behind",
+    "cat": "Direction & position"
+  },
+  {
+    "jp": "右",
+    "rm": "migi",
+    "en": "right",
+    "cat": "Direction & position"
+  },
+  {
+    "jp": "左",
+    "rm": "hidari",
+    "en": "left",
+    "cat": "Direction & position"
+  },
+  {
+    "jp": "中",
+    "rm": "naka",
+    "en": "inside",
+    "cat": "Direction & position"
+  },
+  {
+    "jp": "外",
+    "rm": "soto",
+    "en": "outside",
+    "cat": "Direction & position"
+  },
+  {
+    "jp": "近い",
+    "rm": "chikai",
+    "en": "near",
+    "cat": "Direction & position"
+  },
+  {
+    "jp": "遠い",
+    "rm": "tooi",
+    "en": "far",
+    "cat": "Direction & position"
+  },
+  {
+    "jp": "毎日",
+    "rm": "mainichi",
+    "en": "every day",
+    "cat": "Time expressions"
+  },
+  {
+    "jp": "毎週",
+    "rm": "maishuu",
+    "en": "every week",
+    "cat": "Time expressions"
+  },
+  {
+    "jp": "毎月",
+    "rm": "maitsuki",
+    "en": "every month",
+    "cat": "Time expressions"
+  },
+  {
+    "jp": "毎年",
+    "rm": "maitoshi",
+    "en": "every year",
+    "cat": "Time expressions"
+  },
+  {
+    "jp": "今週",
+    "rm": "konshuu",
+    "en": "this week",
+    "cat": "Time expressions"
+  },
+  {
+    "jp": "来週",
+    "rm": "raishuu",
+    "en": "next week",
+    "cat": "Time expressions"
+  },
+  {
+    "jp": "先週",
+    "rm": "senshuu",
+    "en": "last week",
+    "cat": "Time expressions"
+  },
+  {
+    "jp": "午前",
+    "rm": "gozen",
+    "en": "AM",
+    "cat": "Time expressions"
+  },
+  {
+    "jp": "午後",
+    "rm": "gogo",
+    "en": "PM",
+    "cat": "Time expressions"
+  },
+  {
+    "jp": "何時",
+    "rm": "nanji",
+    "en": "what time",
+    "cat": "Time expressions"
+  },
+  {
+    "jp": "テレビ",
+    "rm": "terebi",
+    "en": "television",
+    "cat": "Katakana everyday"
+  },
+  {
+    "jp": "ラジオ",
+    "rm": "rajio",
+    "en": "radio",
+    "cat": "Katakana everyday"
+  },
+  {
+    "jp": "コンピューター",
+    "rm": "konpyuutaa",
+    "en": "computer",
+    "cat": "Katakana everyday"
+  },
+  {
+    "jp": "ノート",
+    "rm": "nooto",
+    "en": "notebook",
+    "cat": "Katakana everyday"
+  },
+  {
+    "jp": "ペン",
+    "rm": "pen",
+    "en": "pen",
+    "cat": "Katakana everyday"
+  },
+  {
+    "jp": "バッグ",
+    "rm": "baggu",
+    "en": "bag",
+    "cat": "Katakana everyday"
+  },
+  {
+    "jp": "シャツ",
+    "rm": "shatsu",
+    "en": "shirt",
+    "cat": "Katakana everyday"
+  },
+  {
+    "jp": "ズボン",
+    "rm": "zubon",
+    "en": "trousers",
+    "cat": "Katakana everyday"
+  },
+  {
+    "jp": "コート",
+    "rm": "kooto",
+    "en": "coat",
+    "cat": "Katakana everyday"
+  },
+  {
+    "jp": "ドア",
+    "rm": "doa",
+    "en": "door",
+    "cat": "Katakana everyday"
+  },
+  {
+    "jp": "洗う",
+    "rm": "arau",
+    "en": "wash",
+    "cat": "Additional daily life verbs"
+  },
+  {
+    "jp": "掃除する",
+    "rm": "souji suru",
+    "en": "clean (room)",
+    "cat": "Additional daily life verbs"
+  },
+  {
+    "jp": "料理する",
+    "rm": "ryouri suru",
+    "en": "cook",
+    "cat": "Additional daily life verbs"
+  },
+  {
+    "jp": "泳ぐ",
+    "rm": "oyogu",
+    "en": "swim",
+    "cat": "Additional daily life verbs"
+  },
+  {
+    "jp": "登る",
+    "rm": "noboru",
+    "en": "climb",
+    "cat": "Additional daily life verbs"
+  },
+  {
+    "jp": "帰り",
+    "rm": "kaeri",
+    "en": "return (noun form)",
+    "cat": "Useful everyday words"
+  },
+  {
+    "jp": "留守",
+    "rm": "rusu",
+    "en": "absence",
+    "cat": "Useful everyday words"
+  },
+  {
+    "jp": "留学",
+    "rm": "ryuugaku",
+    "en": "study abroad",
+    "cat": "Useful everyday words"
+  },
+  {
+    "jp": "趣味",
+    "rm": "shumi",
+    "en": "hobby",
+    "cat": "Useful everyday words"
+  },
+  {
+    "jp": "用事",
+    "rm": "youji",
+    "en": "errand",
+    "cat": "Useful everyday words"
+  },
+  {
+    "jp": "場",
+    "rm": "basho",
+    "en": "place",
+    "cat": "Useful everyday words"
+  },
+  {
+    "jp": "方向",
+    "rm": "houkou",
+    "en": "direction",
+    "cat": "Useful everyday words"
+  },
+  {
+    "jp": "経験",
+    "rm": "keiken",
+    "en": "experience",
+    "cat": "Useful everyday words"
+  },
+  {
+    "jp": "文化",
+    "rm": "bunka",
+    "en": "culture",
+    "cat": "Useful everyday words"
+  },
+  {
+    "jp": "世界",
+    "rm": "sekai",
+    "en": "world",
+    "cat": "Useful everyday words"
+  },
+  {
+    "jp": "そして",
+    "rm": "soshite",
+    "en": "and then",
+    "cat": "Connectors & grammar"
+  },
+  {
+    "jp": "でも",
+    "rm": "demo",
+    "en": "but",
+    "cat": "Connectors & grammar"
+  },
+  {
+    "jp": "だから",
+    "rm": "dakara",
+    "en": "therefore / so",
+    "cat": "Connectors & grammar"
+  },
+  {
+    "jp": "しかし",
+    "rm": "shikashi",
+    "en": "however",
+    "cat": "Connectors & grammar"
+  },
+  {
+    "jp": "それから",
+    "rm": "sorekara",
+    "en": "after that",
+    "cat": "Connectors & grammar"
+  },
+  {
+    "jp": "もし",
+    "rm": "moshi",
+    "en": "if",
+    "cat": "Connectors & grammar"
+  },
+  {
+    "jp": "たぶん",
+    "rm": "tabun",
+    "en": "probably",
+    "cat": "Connectors & grammar"
+  },
+  {
+    "jp": "とても",
+    "rm": "totemo",
+    "en": "very",
+    "cat": "Connectors & grammar"
+  },
+  {
+    "jp": "いつも",
+    "rm": "itsumo",
+    "en": "always",
+    "cat": "Connectors & grammar"
+  },
+  {
+    "jp": "ときどき",
+    "rm": "tokidoki",
+    "en": "sometimes",
+    "cat": "Connectors & grammar"
+  },
+  {
+    "jp": "まだ",
+    "rm": "mada",
+    "en": "still / not yet",
+    "cat": "Connectors & grammar"
+  },
+  {
+    "jp": "もう",
+    "rm": "mou",
+    "en": "already / enough",
+    "cat": "Connectors & grammar"
+  },
+  {
+    "jp": "すぐ",
+    "rm": "sugu",
+    "en": "immediately",
+    "cat": "Connectors & grammar"
+  },
+  {
+    "jp": "ぜひ",
+    "rm": "zehi",
+    "en": "by all means / definitely",
+    "cat": "Connectors & grammar"
+  },
+  {
+    "jp": "もちろん",
+    "rm": "mochiron",
+    "en": "of course",
+    "cat": "Connectors & grammar"
+  },
+  {
+    "jp": "いつ",
+    "rm": "itsu",
+    "en": "when",
+    "cat": "Question words"
+  },
+  {
+    "jp": "どこ",
+    "rm": "doko",
+    "en": "where",
+    "cat": "Question words"
+  },
+  {
+    "jp": "どちら",
+    "rm": "dochira",
+    "en": "which way / polite which",
+    "cat": "Question words"
+  },
+  {
+    "jp": "どう",
+    "rm": "dou",
+    "en": "how",
+    "cat": "Question words"
+  },
+  {
+    "jp": "どうして",
+    "rm": "doushite",
+    "en": "why",
+    "cat": "Question words"
+  },
+  {
+    "jp": "なぜ",
+    "rm": "naze",
+    "en": "why (formal)",
+    "cat": "Question words"
+  },
+  {
+    "jp": "いくら",
+    "rm": "ikura",
+    "en": "how much",
+    "cat": "Question words"
+  },
+  {
+    "jp": "いくつ",
+    "rm": "ikutsu",
+    "en": "how many",
+    "cat": "Question words"
+  },
+  {
+    "jp": "どんな",
+    "rm": "donna",
+    "en": "what kind of",
+    "cat": "Question words"
+  },
+  {
+    "jp": "どれ",
+    "rm": "dore",
+    "en": "which one",
+    "cat": "Question words"
+  },
+  {
+    "jp": "仕事",
+    "rm": "shigoto",
+    "en": "job / work",
+    "cat": "Work & school"
+  },
+  {
+    "jp": "会議",
+    "rm": "kaigi",
+    "en": "meeting",
+    "cat": "Work & school"
+  },
+  {
+    "jp": "宿題",
+    "rm": "shukudai",
+    "en": "homework",
+    "cat": "Work & school"
+  },
+  {
+    "jp": "試験",
+    "rm": "shiken",
+    "en": "exam",
+    "cat": "Work & school"
+  },
+  {
+    "jp": "勉強",
+    "rm": "benkyou",
+    "en": "study",
+    "cat": "Work & school"
+  },
+  {
+    "jp": "授業",
+    "rm": "jugyou",
+    "en": "class",
+    "cat": "Work & school"
+  },
+  {
+    "jp": "質問",
+    "rm": "shitsumon",
+    "en": "question",
+    "cat": "Work & school"
+  },
+  {
+    "jp": "答え",
+    "rm": "kotae",
+    "en": "answer",
+    "cat": "Work & school"
+  },
+  {
+    "jp": "練習",
+    "rm": "renshuu",
+    "en": "practice",
+    "cat": "Work & school"
+  },
+  {
+    "jp": "成績",
+    "rm": "seiseki",
+    "en": "grades",
+    "cat": "Work & school"
+  },
+  {
+    "jp": "お金",
+    "rm": "okane",
+    "en": "money",
+    "cat": "Shopping & money"
+  },
+  {
+    "jp": "円",
+    "rm": "en",
+    "en": "yen",
+    "cat": "Shopping & money"
+  },
+  {
+    "jp": "高すぎる",
+    "rm": "takasugiru",
+    "en": "too expensive",
+    "cat": "Shopping & money"
+  },
+  {
+    "jp": "安すぎる",
+    "rm": "yasusugiru",
+    "en": "too cheap",
+    "cat": "Shopping & money"
+  },
+  {
+    "jp": "売る",
+    "rm": "uru",
+    "en": "sell",
+    "cat": "Shopping & money"
+  },
+  {
+    "jp": "買い物",
+    "rm": "kaimono",
+    "en": "shopping",
+    "cat": "Shopping & money"
+  },
+  {
+    "jp": "現金",
+    "rm": "genkin",
+    "en": "cash",
+    "cat": "Shopping & money"
+  },
+  {
+    "jp": "料金",
+    "rm": "ryoukin",
+    "en": "fee",
+    "cat": "Shopping & money"
+  },
+  {
+    "jp": "無料",
+    "rm": "muryou",
+    "en": "free (no cost)",
+    "cat": "Shopping & money"
+  },
+  {
+    "jp": "割引",
+    "rm": "waribiki",
+    "en": "discount",
+    "cat": "Shopping & money"
+  },
+  {
+    "jp": "飛行機",
+    "rm": "hikouki",
+    "en": "airplane",
+    "cat": "Travel & transportation"
+  },
+  {
+    "jp": "空港",
+    "rm": "kuukou",
+    "en": "airport",
+    "cat": "Travel & transportation"
+  },
+  {
+    "jp": "電車",
+    "rm": "densha",
+    "en": "train",
+    "cat": "Travel & transportation"
+  },
+  {
+    "jp": "切符",
+    "rm": "kippu",
+    "en": "ticket",
+    "cat": "Travel & transportation"
+  },
+  {
+    "jp": "乗る",
+    "rm": "noru",
+    "en": "ride",
+    "cat": "Travel & transportation"
+  },
+  {
+    "jp": "降りる",
+    "rm": "oriru",
+    "en": "get off",
+    "cat": "Travel & transportation"
+  },
+  {
+    "jp": "地図",
+    "rm": "chizu",
+    "en": "map",
+    "cat": "Travel & transportation"
+  },
+  {
+    "jp": "道",
+    "rm": "michi",
+    "en": "road",
+    "cat": "Travel & transportation"
+  },
+  {
+    "jp": "信号",
+    "rm": "shingou",
+    "en": "traffic light",
+    "cat": "Travel & transportation"
+  },
+  {
+    "jp": "旅行",
+    "rm": "ryoko",
+    "en": "travel",
+    "cat": "Travel & transportation"
+  },
+  {
+    "jp": "体",
+    "rm": "karada",
+    "en": "body",
+    "cat": "Health & body"
+  },
+  {
+    "jp": "頭",
+    "rm": "atama",
+    "en": "head",
+    "cat": "Health & body"
+  },
+  {
+    "jp": "手",
+    "rm": "te",
+    "en": "hand",
+    "cat": "Health & body"
+  },
+  {
+    "jp": "足",
+    "rm": "ashi",
+    "en": "leg / foot",
+    "cat": "Health & body"
+  },
+  {
+    "jp": "目",
+    "rm": "me",
+    "en": "eye",
+    "cat": "Health & body"
+  },
+  {
+    "jp": "耳",
+    "rm": "mimi",
+    "en": "ear",
+    "cat": "Health & body"
+  },
+  {
+    "jp": "口",
+    "rm": "kuchi",
+    "en": "mouth",
+    "cat": "Health & body"
+  },
+  {
+    "jp": "痛い",
+    "rm": "itai",
+    "en": "painful",
+    "cat": "Health & body"
+  },
+  {
+    "jp": "病気",
+    "rm": "byouki",
+    "en": "illness",
+    "cat": "Health & body"
+  },
+  {
+    "jp": "薬",
+    "rm": "kusuri",
+    "en": "medicine",
+    "cat": "Health & body"
+  },
+  {
+    "jp": "天気",
+    "rm": "tenki",
+    "en": "weather",
+    "cat": "Weather & nature"
+  },
+  {
+    "jp": "雨",
+    "rm": "ame",
+    "en": "rain",
+    "cat": "Weather & nature"
+  },
+  {
+    "jp": "雪",
+    "rm": "yuki",
+    "en": "snow",
+    "cat": "Weather & nature"
+  },
+  {
+    "jp": "風",
+    "rm": "kaze",
+    "en": "wind",
+    "cat": "Weather & nature"
+  },
+  {
+    "jp": "空",
+    "rm": "sora",
+    "en": "sky",
+    "cat": "Weather & nature"
+  },
+  {
+    "jp": "海",
+    "rm": "umi",
+    "en": "sea",
+    "cat": "Weather & nature"
+  },
+  {
+    "jp": "山",
+    "rm": "yama",
+    "en": "mountain",
+    "cat": "Weather & nature"
+  },
+  {
+    "jp": "川",
+    "rm": "kawa",
+    "en": "river",
+    "cat": "Weather & nature"
+  },
+  {
+    "jp": "花",
+    "rm": "hana",
+    "en": "flower",
+    "cat": "Weather & nature"
+  },
+  {
+    "jp": "木",
+    "rm": "ki",
+    "en": "tree",
+    "cat": "Weather & nature"
+  },
+  {
+    "jp": "たくさん",
+    "rm": "takusan",
+    "en": "many / a lot",
+    "cat": "Frequency & quantity"
+  },
+  {
+    "jp": "少し",
+    "rm": "sukoshi",
+    "en": "a little",
+    "cat": "Frequency & quantity"
+  },
+  {
+    "jp": "全部",
+    "rm": "zenbu",
+    "en": "all",
+    "cat": "Frequency & quantity"
+  },
+  {
+    "jp": "半分",
+    "rm": "hanbun",
+    "en": "half",
+    "cat": "Frequency & quantity"
+  },
+  {
+    "jp": "一緒",
+    "rm": "issho",
+    "en": "together",
+    "cat": "Frequency & quantity"
+  },
+  {
+    "jp": "別々",
+    "rm": "betsubetsu",
+    "en": "separately",
+    "cat": "Frequency & quantity"
+  },
+  {
+    "jp": "同じ",
+    "rm": "onaji",
+    "en": "same",
+    "cat": "Frequency & quantity"
+  },
+  {
+    "jp": "違う",
+    "rm": "chigau",
+    "en": "different",
+    "cat": "Frequency & quantity"
+  },
+  {
+    "jp": "本当",
+    "rm": "hontou",
+    "en": "true",
+    "cat": "Frequency & quantity"
+  },
+  {
+    "jp": "大丈夫",
+    "rm": "daijoubu",
+    "en": "okay / alright",
+    "cat": "Frequency & quantity"
+  },
+  {
+    "jp": "泊まる",
+    "rm": "tomaru",
+    "en": "stay overnight",
+    "cat": "Everyday actions"
+  },
+  {
+    "jp": "呼ぶ",
+    "rm": "yobu",
+    "en": "call (someone)",
+    "cat": "Everyday actions"
+  },
+  {
+    "jp": "返す",
+    "rm": "kaesu",
+    "en": "return (something)",
+    "cat": "Everyday actions"
+  },
+  {
+    "jp": "落ちる",
+    "rm": "ochiru",
+    "en": "fall",
+    "cat": "Everyday actions"
+  },
+  {
+    "jp": "見つける",
+    "rm": "mitsukeru",
+    "en": "find",
+    "cat": "Everyday actions"
+  },
+  {
+    "jp": "成功",
+    "rm": "seikou",
+    "en": "success",
+    "cat": "Abstract words"
+  },
+  {
+    "jp": "失敗",
+    "rm": "shippai",
+    "en": "failure",
+    "cat": "Abstract words"
+  },
+  {
+    "jp": "努力",
+    "rm": "doryoku",
+    "en": "effort",
+    "cat": "Abstract words"
+  },
+  {
+    "jp": "自由",
+    "rm": "jiyuu",
+    "en": "freedom",
+    "cat": "Abstract words"
+  },
+  {
+    "jp": "安心する",
+    "rm": "anshin suru",
+    "en": "feel relieved",
+    "cat": "Abstract words"
+  },
+  {
+    "jp": "間違い",
+    "rm": "machigai",
+    "en": "mistake",
+    "cat": "Social / daily life"
+  },
+  {
+    "jp": "予定表",
+    "rm": "yoteihyou",
+    "en": "schedule",
+    "cat": "Social / daily life"
+  },
+  {
+    "jp": "報告",
+    "rm": "houkoku",
+    "en": "report",
+    "cat": "Social / daily life"
+  },
+  {
+    "jp": "理解",
+    "rm": "rikai",
+    "en": "understanding",
+    "cat": "Social / daily life"
+  },
+  {
+    "jp": "説明",
+    "rm": "setsumei",
+    "en": "explanation",
+    "cat": "Social / daily life"
+  },
+  {
+    "jp": "おはよう",
+    "rm": "ohayou",
+    "en": "good morning",
+    "cat": "Conversation expressions"
+  },
+  {
+    "jp": "こんにちは",
+    "rm": "konnichiwa",
+    "en": "hello",
+    "cat": "Conversation expressions"
+  },
+  {
+    "jp": "こんばんは",
+    "rm": "konbanwa",
+    "en": "good evening",
+    "cat": "Conversation expressions"
+  },
+  {
+    "jp": "おやすみ",
+    "rm": "oyasumi",
+    "en": "good night",
+    "cat": "Conversation expressions"
+  },
+  {
+    "jp": "ありがとう",
+    "rm": "arigatou",
+    "en": "thank you",
+    "cat": "Conversation expressions"
+  },
+  {
+    "jp": "すみません",
+    "rm": "sumimasen",
+    "en": "excuse me / sorry",
+    "cat": "Conversation expressions"
+  },
+  {
+    "jp": "ごめん",
+    "rm": "gomen",
+    "en": "sorry (casual)",
+    "cat": "Conversation expressions"
+  },
+  {
+    "jp": "お願いします",
+    "rm": "onegaishimasu",
+    "en": "please",
+    "cat": "Conversation expressions"
+  },
+  {
+    "jp": "わかりました",
+    "rm": "wakarimashita",
+    "en": "understood",
+    "cat": "Conversation expressions"
+  },
+  {
+    "jp": "わかりません",
+    "rm": "wakarimasen",
+    "en": "don't understand",
+    "cat": "Conversation expressions"
+  },
+  {
+    "jp": "安心",
+    "rm": "anshin",
+    "en": "relief",
+    "cat": "Feelings & states"
+  },
+  {
+    "jp": "心配",
+    "rm": "shinpai",
+    "en": "worry",
+    "cat": "Feelings & states"
+  },
+  {
+    "jp": "緊張",
+    "rm": "kinchou",
+    "en": "nervousness",
+    "cat": "Feelings & states"
+  },
+  {
+    "jp": "疲れる",
+    "rm": "tsukareru",
+    "en": "to get tired",
+    "cat": "Feelings & states"
+  },
+  {
+    "jp": "疲れた",
+    "rm": "tsukareta",
+    "en": "tired",
+    "cat": "Feelings & states"
+  },
+  {
+    "jp": "楽",
+    "rm": "raku",
+    "en": "comfortable / easy",
+    "cat": "Feelings & states"
+  },
+  {
+    "jp": "寂しい",
+    "rm": "sabishii",
+    "en": "lonely",
+    "cat": "Feelings & states"
+  },
+  {
+    "jp": "怖い",
+    "rm": "kowai",
+    "en": "scary",
+    "cat": "Feelings & states"
+  },
+  {
+    "jp": "嫌い",
+    "rm": "kirai",
+    "en": "dislike",
+    "cat": "Feelings & states"
+  },
+  {
+    "jp": "好き",
+    "rm": "suki",
+    "en": "like",
+    "cat": "Feelings & states"
+  },
+  {
+    "jp": "送る",
+    "rm": "okuru",
+    "en": "send",
+    "cat": "Movement & action verbs"
+  },
+  {
+    "jp": "迎える",
+    "rm": "mukaeru",
+    "en": "pick up (someone)",
+    "cat": "Movement & action verbs"
+  },
+  {
+    "jp": "借りる",
+    "rm": "kariru",
+    "en": "borrow",
+    "cat": "Movement & action verbs"
+  },
+  {
+    "jp": "貸す",
+    "rm": "kasu",
+    "en": "lend",
+    "cat": "Movement & action verbs"
+  },
+  {
+    "jp": "教える",
+    "rm": "oshieru",
+    "en": "teach",
+    "cat": "Movement & action verbs"
+  },
+  {
+    "jp": "習う",
+    "rm": "narau",
+    "en": "learn",
+    "cat": "Movement & action verbs"
+  },
+  {
+    "jp": "考える",
+    "rm": "kangaeru",
+    "en": "think",
+    "cat": "Movement & action verbs"
+  },
+  {
+    "jp": "知る",
+    "rm": "shiru",
+    "en": "know (fact)",
+    "cat": "Movement & action verbs"
+  },
+  {
+    "jp": "住む",
+    "rm": "sumu",
+    "en": "live",
+    "cat": "Movement & action verbs"
+  },
+  {
+    "jp": "引っ越す",
+    "rm": "hikkosu",
+    "en": "move house",
+    "cat": "Movement & action verbs"
+  },
+  {
+    "jp": "親切",
+    "rm": "shinsetsu",
+    "en": "kind",
+    "cat": "Describing people"
+  },
+  {
+    "jp": "有名",
+    "rm": "yuumei",
+    "en": "famous",
+    "cat": "Describing people"
+  },
+  {
+    "jp": "面白い",
+    "rm": "omoshiroi",
+    "en": "interesting",
+    "cat": "Describing people"
+  },
+  {
+    "jp": "まじめ",
+    "rm": "majime",
+    "en": "serious",
+    "cat": "Describing people"
+  },
+  {
+    "jp": "元気な",
+    "rm": "genki na",
+    "en": "energetic (na-adj)",
+    "cat": "Describing people"
+  },
+  {
+    "jp": "静か",
+    "rm": "shizuka",
+    "en": "quiet",
+    "cat": "Describing people"
+  },
+  {
+    "jp": "にぎやか",
+    "rm": "nigiyaka",
+    "en": "lively",
+    "cat": "Describing people"
+  },
+  {
+    "jp": "若い",
+    "rm": "wakai",
+    "en": "young",
+    "cat": "Describing people"
+  },
+  {
+    "jp": "年上",
+    "rm": "toshiue",
+    "en": "older",
+    "cat": "Describing people"
+  },
+  {
+    "jp": "年下",
+    "rm": "toshishita",
+    "en": "younger",
+    "cat": "Describing people"
+  },
+  {
+    "jp": "パソコン",
+    "rm": "pasokon",
+    "en": "PC",
+    "cat": "Technology & modern life"
+  },
+  {
+    "jp": "インターネット",
+    "rm": "intaanetto",
+    "en": "internet",
+    "cat": "Technology & modern life"
+  },
+  {
+    "jp": "メール",
+    "rm": "meeru",
+    "en": "email",
+    "cat": "Technology & modern life"
+  },
+  {
+    "jp": "写真",
+    "rm": "shashin",
+    "en": "photo",
+    "cat": "Technology & modern life"
+  },
+  {
+    "jp": "動画",
+    "rm": "douga",
+    "en": "video",
+    "cat": "Technology & modern life"
+  },
+  {
+    "jp": "音楽",
+    "rm": "ongaku",
+    "en": "music",
+    "cat": "Technology & modern life"
+  },
+  {
+    "jp": "ゲーム",
+    "rm": "geemu",
+    "en": "game",
+    "cat": "Technology & modern life"
+  },
+  {
+    "jp": "アプリ",
+    "rm": "apuri",
+    "en": "app",
+    "cat": "Technology & modern life"
+  },
+  {
+    "jp": "充電",
+    "rm": "juuden",
+    "en": "charging",
+    "cat": "Technology & modern life"
+  },
+  {
+    "jp": "電池",
+    "rm": "denchi",
+    "en": "battery",
+    "cat": "Technology & modern life"
+  },
+  {
+    "jp": "朝ご飯",
+    "rm": "asagohan",
+    "en": "breakfast",
+    "cat": "Food & eating"
+  },
+  {
+    "jp": "昼ご飯",
+    "rm": "hirugohan",
+    "en": "lunch",
+    "cat": "Food & eating"
+  },
+  {
+    "jp": "晩ご飯",
+    "rm": "bangohan",
+    "en": "dinner",
+    "cat": "Food & eating"
+  },
+  {
+    "jp": "注文",
+    "rm": "chuumon",
+    "en": "order (food)",
+    "cat": "Food & eating"
+  },
+  {
+    "jp": "おいしい",
+    "rm": "oishii",
+    "en": "delicious",
+    "cat": "Food & eating"
+  },
+  {
+    "jp": "まずい",
+    "rm": "mazui",
+    "en": "bad tasting",
+    "cat": "Food & eating"
+  },
+  {
+    "jp": "甘い",
+    "rm": "amai",
+    "en": "sweet",
+    "cat": "Food & eating"
+  },
+  {
+    "jp": "辛い",
+    "rm": "karai",
+    "en": "spicy",
+    "cat": "Food & eating"
+  },
+  {
+    "jp": "塩",
+    "rm": "shio",
+    "en": "salt",
+    "cat": "Food & eating"
+  },
+  {
+    "jp": "砂糖",
+    "rm": "satou",
+    "en": "sugar",
+    "cat": "Food & eating"
+  },
+  {
+    "jp": "広い",
+    "rm": "hiroi",
+    "en": "wide / spacious",
+    "cat": "Location & description"
+  },
+  {
+    "jp": "狭い",
+    "rm": "semai",
+    "en": "narrow",
+    "cat": "Location & description"
+  },
+  {
+    "jp": "長い",
+    "rm": "nagai",
+    "en": "long",
+    "cat": "Location & description"
+  },
+  {
+    "jp": "短い",
+    "rm": "mijikai",
+    "en": "short",
+    "cat": "Location & description"
+  },
+  {
+    "jp": "明るい",
+    "rm": "akarui",
+    "en": "bright",
+    "cat": "Location & description"
+  },
+  {
+    "jp": "暗い",
+    "rm": "kurai",
+    "en": "dark",
+    "cat": "Location & description"
+  },
+  {
+    "jp": "低い",
+    "rm": "hikui",
+    "en": "low",
+    "cat": "Location & description"
+  },
+  {
+    "jp": "近く",
+    "rm": "chikaku",
+    "en": "nearby",
+    "cat": "Location & description"
+  },
+  {
+    "jp": "真ん中",
+    "rm": "mannaka",
+    "en": "center",
+    "cat": "Location & description"
+  },
+  {
+    "jp": "隣",
+    "rm": "tonari",
+    "en": "next to",
+    "cat": "Location & description"
+  },
+  {
+    "jp": "必要",
+    "rm": "hitsuyou",
+    "en": "necessary",
+    "cat": "Advanced everyday words"
+  },
+  {
+    "jp": "大切",
+    "rm": "taisetsu",
+    "en": "important",
+    "cat": "Advanced everyday words"
+  },
+  {
+    "jp": "問題",
+    "rm": "mondai",
+    "en": "problem",
+    "cat": "Advanced everyday words"
+  },
+  {
+    "jp": "理由",
+    "rm": "riyuu",
+    "en": "reason",
+    "cat": "Advanced everyday words"
+  },
+  {
+    "jp": "意味",
+    "rm": "imi",
+    "en": "meaning",
+    "cat": "Advanced everyday words"
+  },
+  {
+    "jp": "方法",
+    "rm": "houhou",
+    "en": "method",
+    "cat": "Advanced everyday words"
+  },
+  {
+    "jp": "予定",
+    "rm": "yotei",
+    "en": "plan",
+    "cat": "Advanced everyday words"
+  },
+  {
+    "jp": "約束",
+    "rm": "yakusoku",
+    "en": "promise",
+    "cat": "Advanced everyday words"
+  },
+  {
+    "jp": "連絡",
+    "rm": "renraku",
+    "en": "contact",
+    "cat": "Advanced everyday words"
+  },
+  {
+    "jp": "準備",
+    "rm": "junbi",
+    "en": "preparation",
+    "cat": "Advanced everyday words"
+  },
+  {
+    "jp": "思う",
+    "rm": "omou",
+    "en": "think (opinion)",
+    "cat": "Opinion & thinking"
+  },
+  {
+    "jp": "感じる",
+    "rm": "kanjiru",
+    "en": "feel",
+    "cat": "Opinion & thinking"
+  },
+  {
+    "jp": "決める",
+    "rm": "kimeru",
+    "en": "decide",
+    "cat": "Opinion & thinking"
+  },
+  {
+    "jp": "選ぶ",
+    "rm": "erabu",
+    "en": "choose",
+    "cat": "Opinion & thinking"
+  },
+  {
+    "jp": "比べる",
+    "rm": "kuraberu",
+    "en": "compare",
+    "cat": "Opinion & thinking"
+  },
+  {
+    "jp": "使える",
+    "rm": "tsukaeru",
+    "en": "can use",
+    "cat": "Everyday useful verbs"
+  },
+  {
+    "jp": "見せる",
+    "rm": "miseru",
+    "en": "show",
+    "cat": "Everyday useful verbs"
+  },
+  {
+    "jp": "起こす",
+    "rm": "okosu",
+    "en": "wake someone up",
+    "cat": "Everyday useful verbs"
+  },
+  {
+    "jp": "止まる",
+    "rm": "tomaru",
+    "en": "stop (intransitive)",
+    "cat": "Everyday useful verbs"
+  },
+  {
+    "jp": "止める",
+    "rm": "tomeru",
+    "en": "stop (something)",
+    "cat": "Everyday useful verbs"
+  },
+  {
+    "jp": "危ない",
+    "rm": "abunai",
+    "en": "dangerous",
+    "cat": "Describing situations"
+  },
+  {
+    "jp": "安全",
+    "rm": "anzen",
+    "en": "safe",
+    "cat": "Describing situations"
+  },
+  {
+    "jp": "特別",
+    "rm": "tokubetsu",
+    "en": "special",
+    "cat": "Describing situations"
+  },
+  {
+    "jp": "普通",
+    "rm": "futsuu",
+    "en": "normal",
+    "cat": "Describing situations"
+  },
+  {
+    "jp": "最近",
+    "rm": "saikin",
+    "en": "recently",
+    "cat": "Describing situations"
+  },
+  {
+    "jp": "参加",
+    "rm": "sanka",
+    "en": "participate",
+    "cat": "Social & interaction"
+  },
+  {
+    "jp": "招待",
+    "rm": "shoutai",
+    "en": "invite",
+    "cat": "Social & interaction"
+  },
+  {
+    "jp": "紹介",
+    "rm": "shoukai",
+    "en": "introduce",
+    "cat": "Social & interaction"
+  },
+  {
+    "jp": "会話",
+    "rm": "kaiwa",
+    "en": "conversation",
+    "cat": "Social & interaction"
+  },
+  {
+    "jp": "意見",
+    "rm": "iken",
+    "en": "opinion",
+    "cat": "Social & interaction"
+  },
+  {
+    "jp": "プログラム",
+    "rm": "puroguramu",
+    "en": "program",
+    "cat": "Katakana – Technology & Modern Life"
+  },
+  {
+    "jp": "データ",
+    "rm": "deeta",
+    "en": "data",
+    "cat": "Katakana – Technology & Modern Life"
+  },
+  {
+    "jp": "ファイル",
+    "rm": "fairu",
+    "en": "file",
+    "cat": "Katakana – Technology & Modern Life"
+  },
+  {
+    "jp": "パスワード",
+    "rm": "pasuwaado",
+    "en": "password",
+    "cat": "Katakana – Technology & Modern Life"
+  },
+  {
+    "jp": "サイト",
+    "rm": "saito",
+    "en": "website",
+    "cat": "Katakana – Technology & Modern Life"
+  },
+  {
+    "jp": "サーバー",
+    "rm": "saabaa",
+    "en": "server",
+    "cat": "Katakana – Technology & Modern Life"
+  },
+  {
+    "jp": "ダウンロード",
+    "rm": "daunroodo",
+    "en": "download",
+    "cat": "Katakana – Technology & Modern Life"
+  },
+  {
+    "jp": "アップロード",
+    "rm": "appuroodo",
+    "en": "upload",
+    "cat": "Katakana – Technology & Modern Life"
+  },
+  {
+    "jp": "キーボード",
+    "rm": "kiiboodo",
+    "en": "keyboard",
+    "cat": "Katakana – Technology & Modern Life"
+  },
+  {
+    "jp": "マウス",
+    "rm": "mausu",
+    "en": "mouse",
+    "cat": "Katakana – Technology & Modern Life"
+  },
+  {
+    "jp": "アルバイト",
+    "rm": "arubaito",
+    "en": "part-time job",
+    "cat": "Katakana – Daily Modern Words"
+  },
+  {
+    "jp": "サービス",
+    "rm": "saabisu",
+    "en": "service",
+    "cat": "Katakana – Daily Modern Words"
+  },
+  {
+    "jp": "チャンス",
+    "rm": "chansu",
+    "en": "chance",
+    "cat": "Katakana – Daily Modern Words"
+  },
+  {
+    "jp": "スポーツ",
+    "rm": "supootsu",
+    "en": "sport",
+    "cat": "Katakana – Daily Modern Words"
+  },
+  {
+    "jp": "ニュース",
+    "rm": "nyuusu",
+    "en": "news",
+    "cat": "Katakana – Daily Modern Words"
+  },
+  {
+    "jp": "パーティー",
+    "rm": "paatii",
+    "en": "party",
+    "cat": "Katakana – Daily Modern Words"
+  },
+  {
+    "jp": "プレゼント",
+    "rm": "purezento",
+    "en": "present (gift)",
+    "cat": "Katakana – Daily Modern Words"
+  },
+  {
+    "jp": "スケジュール",
+    "rm": "sukejuuru",
+    "en": "schedule",
+    "cat": "Katakana – Daily Modern Words"
+  },
+  {
+    "jp": "エレベーター",
+    "rm": "erebeetaa",
+    "en": "elevator",
+    "cat": "Katakana – Daily Modern Words"
+  },
+  {
+    "jp": "エスカレーター",
+    "rm": "esukareetaa",
+    "en": "escalator",
+    "cat": "Katakana – Daily Modern Words"
+  },
+  {
+    "jp": "社会",
+    "rm": "shakai",
+    "en": "society",
+    "cat": "Business & Society"
+  },
+  {
+    "jp": "経済",
+    "rm": "keizai",
+    "en": "economy",
+    "cat": "Business & Society"
+  },
+  {
+    "jp": "政府",
+    "rm": "seifu",
+    "en": "government",
+    "cat": "Business & Society"
+  },
+  {
+    "jp": "法律",
+    "rm": "houritsu",
+    "en": "law",
+    "cat": "Business & Society"
+  },
+  {
+    "jp": "会社員",
+    "rm": "kaishain",
+    "en": "company employee",
+    "cat": "Business & Society"
+  },
+  {
+    "jp": "上司",
+    "rm": "joushi",
+    "en": "boss",
+    "cat": "Business & Society"
+  },
+  {
+    "jp": "同僚",
+    "rm": "douryou",
+    "en": "colleague",
+    "cat": "Business & Society"
+  },
+  {
+    "jp": "部長",
+    "rm": "buchou",
+    "en": "department head",
+    "cat": "Business & Society"
+  },
+  {
+    "jp": "会話力",
+    "rm": "kaiwaryoku",
+    "en": "conversation ability",
+    "cat": "Business & Society"
+  },
+  {
+    "jp": "能力",
+    "rm": "nouryoku",
+    "en": "ability",
+    "cat": "Business & Society"
+  },
+  {
+    "jp": "続ける",
+    "rm": "tsuzukeru",
+    "en": "continue",
+    "cat": "More Useful Verbs"
+  },
+  {
+    "jp": "続く",
+    "rm": "tsuzuku",
+    "en": "continue (intransitive)",
+    "cat": "More Useful Verbs"
+  },
+  {
+    "jp": "変える",
+    "rm": "kaeru",
+    "en": "change (something)",
+    "cat": "More Useful Verbs"
+  },
+  {
+    "jp": "変わる",
+    "rm": "kawaru",
+    "en": "change (intransitive)",
+    "cat": "More Useful Verbs"
+  },
+  {
+    "jp": "決まる",
+    "rm": "kimaru",
+    "en": "be decided",
+    "cat": "More Useful Verbs"
+  },
+  {
+    "jp": "増える",
+    "rm": "fueru",
+    "en": "increase",
+    "cat": "More Useful Verbs"
+  },
+  {
+    "jp": "増やす",
+    "rm": "fuyasu",
+    "en": "increase (something)",
+    "cat": "More Useful Verbs"
+  },
+  {
+    "jp": "減る",
+    "rm": "heru",
+    "en": "decrease",
+    "cat": "More Useful Verbs"
+  },
+  {
+    "jp": "減らす",
+    "rm": "herasu",
+    "en": "reduce",
+    "cat": "More Useful Verbs"
+  },
+  {
+    "jp": "確認",
+    "rm": "kakunin",
+    "en": "confirmation",
+    "cat": "More Useful Verbs"
+  },
+  {
+    "jp": "賛成",
+    "rm": "sansei",
+    "en": "agree",
+    "cat": "Opinion & Communication"
+  },
+  {
+    "jp": "反対",
+    "rm": "hantai",
+    "en": "oppose",
+    "cat": "Opinion & Communication"
+  },
+  {
+    "jp": "提案",
+    "rm": "teian",
+    "en": "proposal",
+    "cat": "Opinion & Communication"
+  },
+  {
+    "jp": "質",
+    "rm": "shitsu",
+    "en": "quality",
+    "cat": "Opinion & Communication"
+  },
+  {
+    "jp": "内容",
+    "rm": "naiyou",
+    "en": "content",
+    "cat": "Opinion & Communication"
+  },
+  {
+    "jp": "状況",
+    "rm": "joukyou",
+    "en": "situation",
+    "cat": "Opinion & Communication"
+  },
+  {
+    "jp": "結果",
+    "rm": "kekka",
+    "en": "result",
+    "cat": "Opinion & Communication"
+  },
+  {
+    "jp": "原因",
+    "rm": "genin",
+    "en": "cause",
+    "cat": "Opinion & Communication"
+  },
+  {
+    "jp": "解決",
+    "rm": "kaiketsu",
+    "en": "solution",
+    "cat": "Opinion & Communication"
+  },
+  {
+    "jp": "選択",
+    "rm": "sentaku",
+    "en": "choice",
+    "cat": "Opinion & Communication"
+  },
+  {
+    "jp": "翻訳",
+    "rm": "hon'yaku",
+    "en": "translation",
+    "cat": "Advanced Everyday Words"
+  },
+  {
+    "jp": "連続",
+    "rm": "renzoku",
+    "en": "continuation",
+    "cat": "Advanced Everyday Words"
+  },
+  {
+    "jp": "比較",
+    "rm": "hikaku",
+    "en": "comparison",
+    "cat": "Advanced Everyday Words"
+  },
+  {
+    "jp": "情報",
+    "rm": "jouhou",
+    "en": "information",
+    "cat": "Advanced Everyday Words"
+  },
+  {
+    "jp": "連休",
+    "rm": "renkyuu",
+    "en": "consecutive holidays",
+    "cat": "Advanced Everyday Words"
+  },
+  {
+    "jp": "活動",
+    "rm": "katsudou",
+    "en": "activity",
+    "cat": "Advanced Everyday Words"
+  },
+  {
+    "jp": "発表",
+    "rm": "happyou",
+    "en": "presentation",
+    "cat": "Advanced Everyday Words"
+  },
+  {
+    "jp": "利用",
+    "rm": "riyou",
+    "en": "usage",
+    "cat": "Advanced Everyday Words"
+  },
+  {
+    "jp": "実際",
+    "rm": "jissai",
+    "en": "actually",
+    "cat": "Advanced Everyday Words"
+  },
+  {
+    "jp": "当然",
+    "rm": "touzen",
+    "en": "natural / obvious",
+    "cat": "Advanced Everyday Words"
+  },
+  {
+    "jp": "ガソリン",
+    "rm": "gasorin",
+    "en": "gasoline",
+    "cat": "More Katakana (Common Everyday)"
+  },
+  {
+    "jp": "ガラス",
+    "rm": "garasu",
+    "en": "glass",
+    "cat": "More Katakana (Common Everyday)"
+  },
+  {
+    "jp": "コップ",
+    "rm": "koppu",
+    "en": "cup",
+    "cat": "More Katakana (Common Everyday)"
+  },
+  {
+    "jp": "パンフレット",
+    "rm": "panfuretto",
+    "en": "pamphlet",
+    "cat": "More Katakana (Common Everyday)"
+  },
+  {
+    "jp": "レシート",
+    "rm": "reshiito",
+    "en": "receipt",
+    "cat": "More Katakana (Common Everyday)"
+  },
+  {
+    "jp": "テーブル",
+    "rm": "teeburu",
+    "en": "table",
+    "cat": "More Katakana (Common Everyday)"
+  },
+  {
+    "jp": "ソファ",
+    "rm": "sofa",
+    "en": "sofa",
+    "cat": "More Katakana (Common Everyday)"
+  },
+  {
+    "jp": "カーテン",
+    "rm": "kaaten",
+    "en": "curtain",
+    "cat": "More Katakana (Common Everyday)"
+  },
+  {
+    "jp": "リモコン",
+    "rm": "rimokon",
+    "en": "remote control",
+    "cat": "More Katakana (Common Everyday)"
+  },
+  {
+    "jp": "ミーティング",
+    "rm": "miitingu",
+    "en": "meeting (loanword)",
+    "cat": "More Katakana (Common Everyday)"
+  },
+  {
+    "jp": "支払う",
+    "rm": "shiharau",
+    "en": "pay",
+    "cat": "Practical Everyday Verbs"
+  },
+  {
+    "jp": "送信",
+    "rm": "soushin",
+    "en": "send (data)",
+    "cat": "Practical Everyday Verbs"
+  },
+  {
+    "jp": "受信",
+    "rm": "jushin",
+    "en": "receive (data)",
+    "cat": "Practical Everyday Verbs"
+  },
+  {
+    "jp": "戻る",
+    "rm": "modoru",
+    "en": "return (go back)",
+    "cat": "Practical Everyday Verbs"
+  },
+  {
+    "jp": "進む",
+    "rm": "susumu",
+    "en": "move forward",
+    "cat": "Practical Everyday Verbs"
+  },
+  {
+    "jp": "調べる",
+    "rm": "shiraberu",
+    "en": "investigate",
+    "cat": "Practical Everyday Verbs"
+  },
+  {
+    "jp": "直す",
+    "rm": "naosu",
+    "en": "fix / repair",
+    "cat": "Practical Everyday Verbs"
+  },
+  {
+    "jp": "壊れる",
+    "rm": "kowareru",
+    "en": "break (intransitive)",
+    "cat": "Practical Everyday Verbs"
+  },
+  {
+    "jp": "壊す",
+    "rm": "kowasu",
+    "en": "break (something)",
+    "cat": "Practical Everyday Verbs"
+  },
+  {
+    "jp": "届く",
+    "rm": "todoku",
+    "en": "be delivered",
+    "cat": "Practical Everyday Verbs"
+  },
+  {
+    "jp": "判断",
+    "rm": "handan",
+    "en": "judgment",
+    "cat": "Thinking / Abstract Words"
+  },
+  {
+    "jp": "印象",
+    "rm": "inshou",
+    "en": "impression",
+    "cat": "Thinking / Abstract Words"
+  },
+  {
+    "jp": "記憶",
+    "rm": "kioku",
+    "en": "memory",
+    "cat": "Thinking / Abstract Words"
+  },
+  {
+    "jp": "想像",
+    "rm": "souzou",
+    "en": "imagination",
+    "cat": "Thinking / Abstract Words"
+  },
+  {
+    "jp": "期待",
+    "rm": "kitai",
+    "en": "expectation",
+    "cat": "Thinking / Abstract Words"
+  },
+  {
+    "jp": "責任",
+    "rm": "sekinin",
+    "en": "responsibility",
+    "cat": "Thinking / Abstract Words"
+  },
+  {
+    "jp": "義務",
+    "rm": "gimu",
+    "en": "duty",
+    "cat": "Thinking / Abstract Words"
+  },
+  {
+    "jp": "権利",
+    "rm": "kenri",
+    "en": "right (legal)",
+    "cat": "Thinking / Abstract Words"
+  },
+  {
+    "jp": "価値",
+    "rm": "kachi",
+    "en": "value",
+    "cat": "Thinking / Abstract Words"
+  },
+  {
+    "jp": "目的",
+    "rm": "mokuteki",
+    "en": "purpose",
+    "cat": "Thinking / Abstract Words"
+  },
+  {
+    "jp": "成長",
+    "rm": "seichou",
+    "en": "growth",
+    "cat": "Descriptive / Concept Words"
+  },
+  {
+    "jp": "変化",
+    "rm": "henka",
+    "en": "change",
+    "cat": "Descriptive / Concept Words"
+  },
+  {
+    "jp": "発展",
+    "rm": "hatten",
+    "en": "development",
+    "cat": "Descriptive / Concept Words"
+  },
+  {
+    "jp": "関係",
+    "rm": "kankei",
+    "en": "relationship",
+    "cat": "Descriptive / Concept Words"
+  },
+  {
+    "jp": "影響",
+    "rm": "eikyou",
+    "en": "influence",
+    "cat": "Descriptive / Concept Words"
+  },
+  {
+    "jp": "存在",
+    "rm": "sonzai",
+    "en": "existence",
+    "cat": "Descriptive / Concept Words"
+  },
+  {
+    "jp": "現実",
+    "rm": "genjitsu",
+    "en": "reality",
+    "cat": "Descriptive / Concept Words"
+  },
+  {
+    "jp": "理想",
+    "rm": "risou",
+    "en": "ideal",
+    "cat": "Descriptive / Concept Words"
+  },
+  {
+    "jp": "表現",
+    "rm": "hyougen",
+    "en": "expression",
+    "cat": "Descriptive / Concept Words"
+  },
+  {
+    "jp": "効果",
+    "rm": "kouka",
+    "en": "effect",
+    "cat": "Descriptive / Concept Words"
+  }
+];
+
+const MODES = [20, 50, 100];
+let selectedCount = 50;
+let showRomaji = false;
+let queue = [];
+let current = 0;
+let score = 0;
+let results = [];
+let answered = false;
+let timerInterval = null;
+let timeLeft = 5;
+let currentOpts = [];
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function setMode(count) {
+  selectedCount = count;
+  document.querySelectorAll('.mode-btn[data-count]').forEach(btn => {
+    btn.classList.toggle('active', Number(btn.dataset.count) === count);
+  });
+}
+
+function setRomaji(enabled) {
+  showRomaji = enabled;
+  document.querySelectorAll('.mode-btn[data-romaji]').forEach(btn => {
+    btn.classList.toggle('active', (btn.dataset.romaji === 'on') === enabled);
+  });
+  document.getElementById('help-line').textContent =
+    'Questions are mixed randomly from all 500 words. Romaji is currently ' + (enabled ? 'on.' : 'off.');
+}
+
+
+function displayAnswer(word) {
+  return word.jp + (showRomaji ? ' (' + word.rm + ')' : '');
+}
+
+function getWrongOpts(correct, n) {
+  return shuffle(WORDS.filter(w => w.jp !== correct.jp)).slice(0, n);
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startMultipleChoiceQuiz() {
+  queue = shuffle(WORDS).slice(0, selectedCount);
+  current = 0;
+  score = 0;
+  results = [];
+  answered = false;
+  clearInterval(timerInterval);
+  showScreen('quiz-screen');
+  loadQ();
+}
+
+function loadQ() {
+  if (current >= queue.length) {
+    showResults();
+    return;
+  }
+
+  answered = false;
+  const w = queue[current];
+
+  document.getElementById('word-cat').textContent = w.cat;
+  document.getElementById('word-en').textContent = w.en;
+  document.getElementById('prog-cat').textContent = w.cat;
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('feedback').className = 'feedback-banner';
+  document.getElementById('prog-bar').style.width = ((current / queue.length) * 100) + '%';
+  document.getElementById('prog-label').textContent = current + ' / ' + queue.length;
+  document.getElementById('score-badge').textContent = score + ' pts';
+
+  const wrongWords = getWrongOpts(w, 3);
+  currentOpts = shuffle([w, ...wrongWords]);
+
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+
+  currentOpts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.innerHTML = '<span class="opt-btn-inner"><span class="opt-main"><span class="opt-num">' + (i + 1) + '</span><span class="opt-text"><span class="opt-jp">' + escapeHtml(opt.jp) + '</span>' + (showRomaji ? '<span class="opt-rm">' + escapeHtml(opt.rm) + '</span>' : '') + '</span></span></span>';
+    btn.dataset.jp = opt.jp;
+    btn.onclick = () => pick(opt, w);
+    grid.appendChild(btn);
+  });
+
+  startTimer(w);
+}
+
+function startTimer(word) {
+  clearInterval(timerInterval);
+  timeLeft = 5;
+  updateTimer(5, 5);
+
+  timerInterval = setInterval(() => {
+    timeLeft -= 0.1;
+    updateTimer(timeLeft, 5);
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      if (!answered) timeout(word);
+    }
+  }, 100);
+}
+
+function updateTimer(t, max) {
+  document.getElementById('timer-num').textContent = Math.max(0, Math.ceil(t));
+  const circ = 163;
+  const offset = circ * (1 - Math.max(0, t) / max);
+  const track = document.getElementById('timer-track');
+  track.style.strokeDashoffset = offset;
+  track.style.stroke = t > 2 ? '#7c6ff7' : (t > 1 ? '#fbbf24' : '#f87171');
+}
+
+function pick(chosen, word) {
+  if (answered) return;
+
+  answered = true;
+  clearInterval(timerInterval);
+
+  const ok = chosen.jp === word.jp;
+  if (ok) score++;
+
+  results.push({ word, chosen, result: ok ? 'correct' : 'wrong' });
+
+  document.querySelectorAll('.opt-btn').forEach(btn => {
+    btn.disabled = true;
+    if (btn.dataset.jp === word.jp) btn.classList.add('correct');
+    else if (btn.dataset.jp === chosen.jp && !ok) btn.classList.add('wrong');
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.textContent = ok ? 'Correct!' : 'Wrong — answer: ' + displayAnswer(word);
+  fb.className = 'feedback-banner ' + (ok ? 'correct' : 'wrong');
+
+  setTimeout(() => {
+    current++;
+    loadQ();
+  }, 1300);
+}
+
+function timeout(word) {
+  answered = true;
+  results.push({ word, chosen: null, result: 'timeout' });
+
+  document.querySelectorAll('.opt-btn').forEach(btn => {
+    btn.disabled = true;
+    if (btn.dataset.jp === word.jp) btn.classList.add('correct');
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.textContent = 'Time up! Answer: ' + displayAnswer(word);
+  fb.className = 'feedback-banner timeout';
+
+  setTimeout(() => {
+    current++;
+    loadQ();
+  }, 1300);
+}
+
+document.addEventListener('keydown', e => {
+  const screen = document.querySelector('.screen.active');
+  if (!screen) return;
+
+  if (screen.id === 'quiz-screen' && !answered) {
+    const n = parseInt(e.key, 10);
+    if (n >= 1 && n <= 4 && currentOpts[n - 1]) {
+      const w = queue[current];
+      pick(currentOpts[n - 1], w);
+    }
+  }
+
+  if ((screen.id === 'start-screen' || screen.id === 'result-screen') && (e.key === 'Enter' || e.key === ' ')) {
+    e.preventDefault();
+    startQuiz();
+  }
+});
+
+function scoreMsg(pct) {
+  if (pct >= 95) return 'Perfect! You have mastered these words!';
+  if (pct >= 80) return 'Outstanding! Excellent Japanese vocabulary!';
+  if (pct >= 65) return 'Great work! Keep it up!';
+  if (pct >= 50) return 'Good effort — keep practising!';
+  if (pct >= 30) return 'Getting there — review and try again.';
+  return 'Keep studying — you will improve!';
+}
+
+function showResults() {
+  const wrongs = results.filter(r => r.result === 'wrong').length;
+  const timeouts = results.filter(r => r.result === 'timeout').length;
+  const pct = Math.round((score / queue.length) * 100);
+
+  document.getElementById('final-score').textContent = score;
+  document.getElementById('result-denom').textContent = 'out of ' + queue.length;
+  document.getElementById('final-pct').textContent = pct + '%';
+  document.getElementById('result-msg').textContent = scoreMsg(pct);
+  document.getElementById('rs-correct').textContent = score;
+  document.getElementById('rs-wrong').textContent = wrongs;
+  document.getElementById('rs-timeout').textContent = timeouts;
+
+  const missed = results.filter(r => r.result !== 'correct');
+  const bd = document.getElementById('breakdown');
+
+  if (missed.length === 0) {
+    bd.innerHTML = '<div class="breakdown-header">Perfect run</div><div class="bd-row"><span class="bd-en">You got everything right.</span><span class="bd-jp">🎉</span></div>';
+  } else {
+    let html = '<div class="breakdown-header">Missed words (' + missed.length + ')</div>';
+    missed.forEach(r => {
+      const cls = r.result === 'timeout' ? 't' : 'w';
+      const lbl = r.result === 'timeout' ? 'time' : 'wrong';
+      html += '<div class="bd-row"><span class="bd-en">' + escapeHtml(r.word.en) + '</span><span class="bd-jp">' + escapeHtml(r.word.jp) + (showRomaji ? '<span class="opt-rm" style="display:block;margin-top:2px;">' + escapeHtml(r.word.rm) + '</span>' : '') + '</span><span class="bd-mark ' + cls + '">' + lbl + '</span></div>';
+    });
+    bd.innerHTML = html;
+  }
+
+  showScreen('result-screen');
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+setMode(50);
+setRomaji(false);
+
+
+// ── SPEAKING MODE ──────────────────────────────────────
+let quizType = 'multiple';
+let spQueue = [];
+let spCurrent = 0;
+let spScore = 0;
+let spResults = [];
+let spAnswered = false;
+let spAttempts = 0;
+let spRecog = null;
+let spMicReady = false;
+
+function setQuizType(type) {
+  quizType = type;
+  document.querySelectorAll('.mode-btn[data-qtype]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.qtype === type);
+  });
+}
+
+function initSpRecog() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { spMicReady = false; return; }
+  spMicReady = true;
+}
+
+function buildSpRecog() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return null;
+  const r = new SR();
+  r.lang = 'ja-JP';
+  r.continuous = false;
+  r.interimResults = true;
+  r.maxAlternatives = 6;
+  return r;
+}
+
+function startSpeakingQuiz() {
+  spQueue = shuffle(WORDS).slice(0, selectedCount);
+  spCurrent = 0;
+  spScore = 0;
+  spResults = [];
+  spAnswered = false;
+  showScreen('speaking-screen');
+  loadSpQ();
+}
+
+function loadSpQ() {
+  if (spCurrent >= spQueue.length) { showSpResults(); return; }
+  spAnswered = false;
+  spAttempts = 0;
+  const w = spQueue[spCurrent];
+
+  document.getElementById('sp-word-cat').textContent = w.cat;
+  document.getElementById('sp-word-jp').textContent = w.jp;
+  document.getElementById('sp-word-rm').textContent = showRomaji ? w.rm : '';
+  document.getElementById('sp-word-en').textContent = w.en;
+  document.getElementById('sp-prog-cat').textContent = w.cat;
+  document.getElementById('sp-prog-bar').style.width = ((spCurrent / spQueue.length) * 100) + '%';
+  document.getElementById('sp-prog-label').textContent = spCurrent + ' / ' + spQueue.length;
+  document.getElementById('sp-score-badge').textContent = spScore + ' pts';
+  document.getElementById('sp-feedback').textContent = '';
+  document.getElementById('sp-feedback').className = 'feedback-banner';
+  document.getElementById('sp-heard-text').textContent = '';
+  document.getElementById('sp-attempt-info').textContent = '';
+
+  const micBtn = document.getElementById('sp-mic-btn');
+  micBtn.textContent = '\uD83C\uDFA4';
+  micBtn.className = '';
+  micBtn.disabled = false;
+
+  const skipBtn = document.getElementById('sp-skip-btn');
+  skipBtn.style.opacity = '0';
+  skipBtn.style.pointerEvents = 'none';
+
+  if (!spMicReady) {
+    document.getElementById('sp-feedback').textContent = 'Microphone not available on this device.';
+    document.getElementById('sp-feedback').className = 'feedback-banner timeout';
+    skipBtn.style.opacity = '1';
+    skipBtn.style.pointerEvents = 'auto';
+  } else {
+    document.getElementById('sp-feedback').textContent = '\uD83C\uDFA4 Tap the mic and say the reading aloud in Japanese!';
+    document.getElementById('sp-feedback').className = 'feedback-banner';
+  }
+}
+
+function spOnMicTap() {
+  if (!spMicReady || spAnswered) return;
+  const micBtn = document.getElementById('sp-mic-btn');
+  if (micBtn.classList.contains('listening')) {
+    if (spRecog) { try { spRecog.stop(); } catch(e) {} }
+    return;
+  }
+
+  spRecog = buildSpRecog();
+  if (!spRecog) { spMicReady = false; return; }
+
+  micBtn.classList.add('listening');
+  micBtn.textContent = '\uD83D\uDD34';
+  document.getElementById('sp-feedback').textContent = '\uD83D\uDFE1 Listening... say it in Japanese!';
+  document.getElementById('sp-feedback').className = 'feedback-banner';
+  document.getElementById('sp-heard-text').textContent = '';
+
+  const w = spQueue[spCurrent];
+  let finalResult = '';
+  let resultReceived = false;
+
+  spRecog.onresult = (e) => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) {
+        for (let j = 0; j < e.results[i].length; j++) {
+          const t = e.results[i][j].transcript.trim();
+          if (t.length > finalResult.length) finalResult = t;
+        }
+        resultReceived = true;
+      } else {
+        interim = e.results[i][0].transcript;
+      }
+    }
+    if (interim) document.getElementById('sp-heard-text').textContent = '\u201C' + interim + '\u2026\u201D';
+  };
+
+  spRecog.onend = () => {
+    micBtn.classList.remove('listening');
+    micBtn.textContent = '\uD83C\uDFA4';
+
+    if (!resultReceived || finalResult.length === 0) {
+      spAttempts++;
+      document.getElementById('sp-heard-text').textContent = '';
+      document.getElementById('sp-feedback').textContent = '\uD83E\uDD14 Nothing heard \u2014 tap the mic and try again!';
+      document.getElementById('sp-feedback').className = 'feedback-banner timeout';
+      if (spAttempts >= 3) spShowSkip();
+      return;
+    }
+
+    document.getElementById('sp-heard-text').textContent = '\u201C' + finalResult + '\u201D';
+    const matched = spWordMatch(finalResult, w);
+
+    if (matched) {
+      micBtn.classList.add('success');
+      micBtn.textContent = '\u2705';
+      document.getElementById('sp-feedback').textContent = '\uD83C\uDF89 Correct! ' + w.jp + ' (' + w.rm + ') = ' + w.en;
+      document.getElementById('sp-feedback').className = 'feedback-banner correct';
+      spScore++;
+      spResults.push({ word: w, result: 'correct' });
+      spAnswered = true;
+      setTimeout(() => { spCurrent++; loadSpQ(); }, 1800);
+    } else {
+      spAttempts++;
+      micBtn.classList.add('fail');
+      setTimeout(() => { micBtn.classList.remove('fail'); }, 500);
+      const tries = [
+        '\uD83D\uDE42 Not quite \u2014 try saying: ' + w.rm,
+        '\uD83D\uDC4D Keep going! Try: ' + w.rm,
+        '\uD83D\uDE0A One more time: ' + w.rm,
+      ];
+      document.getElementById('sp-feedback').textContent = tries[Math.min(spAttempts - 1, tries.length - 1)];
+      document.getElementById('sp-feedback').className = 'feedback-banner wrong';
+      document.getElementById('sp-attempt-info').textContent = 'Attempt ' + spAttempts;
+      if (spAttempts >= 3) spShowSkip();
+    }
+  };
+
+  spRecog.onerror = (e) => {
+    micBtn.classList.remove('listening');
+    micBtn.textContent = '\uD83C\uDFA4';
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+      spMicReady = false;
+      document.getElementById('sp-feedback').textContent = '\uD83D\uDEAB Mic blocked \u2014 please allow microphone access in Chrome.';
+      document.getElementById('sp-feedback').className = 'feedback-banner wrong';
+      spShowSkip();
+    } else if (e.error === 'no-speech') {
+      spAttempts++;
+      document.getElementById('sp-feedback').textContent = '\uD83E\uDD14 Nothing heard \u2014 try again!';
+      document.getElementById('sp-feedback').className = 'feedback-banner timeout';
+      if (spAttempts >= 3) spShowSkip();
+    }
+  };
+
+  try { spRecog.start(); } catch(err) {
+    micBtn.classList.remove('listening');
+    micBtn.textContent = '\uD83C\uDFA4';
+  }
+}
+
+function spShowSkip() {
+  const btn = document.getElementById('sp-skip-btn');
+  btn.style.opacity = '1';
+  btn.style.pointerEvents = 'auto';
+}
+
+function spParentSkip() {
+  if (spAnswered) return;
+  if (spRecog) { try { spRecog.stop(); } catch(e) {} }
+  spAnswered = true;
+  const w = spQueue[spCurrent];
+  spResults.push({ word: w, result: 'skipped' });
+  document.getElementById('sp-feedback').textContent = '\u23E9 Skipped \u2014 ' + w.jp + ' (' + w.rm + ') = ' + w.en;
+  document.getElementById('sp-feedback').className = 'feedback-banner timeout';
+  setTimeout(() => { spCurrent++; loadSpQ(); }, 1600);
+}
+
+function spWordMatch(heard, word) {
+  const h = heard.toLowerCase().trim();
+  const rm = word.rm.toLowerCase().trim();
+  const jp = word.jp.trim();
+
+  // Check Japanese characters match
+  if (h.includes(jp)) return true;
+  // Check romaji match  
+  if (h === rm) return true;
+  if (h.includes(rm)) return true;
+  // Check each token
+  const tokens = h.split(/\s+/);
+  for (const tok of tokens) {
+    if (tok === rm) return true;
+    if (tok === jp) return true;
+    if (spLevenshtein(tok, rm) <= Math.max(1, Math.floor(rm.length * 0.3))) return true;
+  }
+  // Also check if heard Japanese matches
+  if (h.replace(/[\s\u3000]/g, '').includes(jp.replace(/[\s\u3000]/g, ''))) return true;
+  return false;
+}
+
+function spLevenshtein(a, b) {
+  const m = a.length, n = b.length;
+  const dp = Array.from({length: m+1}, (_, i) =>
+    Array.from({length: n+1}, (_, j) => i === 0 ? j : j === 0 ? i : 0)
+  );
+  for (let i = 1; i <= m; i++)
+    for (let j = 1; j <= n; j++)
+      dp[i][j] = a[i-1] === b[j-1] ? dp[i-1][j-1] : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+  return dp[m][n];
+}
+
+function showSpResults() {
+  const correct = spResults.filter(r => r.result === 'correct').length;
+  const skipped = spResults.filter(r => r.result === 'skipped').length;
+  const pct = Math.round((correct / spQueue.length) * 100);
+
+  document.getElementById('final-score').textContent = correct;
+  document.getElementById('result-denom').textContent = 'out of ' + spQueue.length;
+  document.getElementById('final-pct').textContent = pct + '%';
+  document.getElementById('result-msg').textContent = scoreMsg(pct) + ' (Speaking Mode)';
+  document.getElementById('rs-correct').textContent = correct;
+  document.getElementById('rs-wrong').textContent = spQueue.length - correct - skipped;
+  document.getElementById('rs-timeout').textContent = skipped;
+
+  const missed = spResults.filter(r => r.result !== 'correct');
+  const bd = document.getElementById('breakdown');
+  if (missed.length === 0) {
+    bd.innerHTML = '<div class="breakdown-header">Perfect run</div><div class="bd-row"><span class="bd-en">You spoke every word correctly.</span><span class="bd-jp">\uD83C\uDF89</span></div>';
+  } else {
+    let html = '<div class="breakdown-header">Missed / skipped (' + missed.length + ')</div>';
+    missed.forEach(r => {
+      const cls = r.result === 'skipped' ? 't' : 'w';
+      const lbl = r.result === 'skipped' ? 'skip' : 'wrong';
+      html += '<div class="bd-row"><span class="bd-en">' + escapeHtml(r.word.en) + '</span><span class="bd-jp">' + escapeHtml(r.word.jp) + '<span class="opt-rm" style="display:block;margin-top:2px;">' + escapeHtml(r.word.rm) + '</span></span><span class="bd-mark ' + cls + '">' + lbl + '</span></div>';
+    });
+    bd.innerHTML = html;
+  }
+  showScreen('result-screen');
+}
+
+// Route to correct quiz type
+function startQuiz() {
+  if (quizType === 'speaking') {
+    startSpeakingQuiz();
+  } else {
+    startMultipleChoiceQuiz();
+  }
+}
+
+// Init mic on load
+initSpRecog();
+
+</script>
+</body>
+</html>
