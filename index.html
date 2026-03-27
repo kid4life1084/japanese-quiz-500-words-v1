@@ -572,12 +572,12 @@
     </div>
 
     <div class="help-line" id="help-line">Questions are mixed randomly from all 500 words. Romaji is currently off.</div>
-    <button class="btn-start" onclick="startQuiz()">Begin Quiz</button>
+    <button class="btn-start" onclick="SFX.click();startQuiz()">Begin Quiz</button>
   </div>
 
   <div id="quiz-screen" class="screen">
     <div class="quiz-top">
-      <button onclick="showScreen('start-screen')" style="background:var(--surface2);border:1px solid var(--border);color:var(--text2);border-radius:var(--radius-sm);padding:clamp(6px,2vw,8px) clamp(10px,3vw,14px);font-family:'Inter',sans-serif;font-size:clamp(11px,2.5vw,13px);font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;min-height:36px;" title="Back to menu">&#x2190; Menu</button>
+      <button onclick="SFX.click();showScreen('start-screen')" style="background:var(--surface2);border:1px solid var(--border);color:var(--text2);border-radius:var(--radius-sm);padding:clamp(6px,2vw,8px) clamp(10px,3vw,14px);font-family:'Inter',sans-serif;font-size:clamp(11px,2.5vw,13px);font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;min-height:36px;" title="Back to menu">&#x2190; Menu</button>
       <div class="progress-wrap">
         <div class="progress-nums">
           <span id="prog-label">0 / 50</span>
@@ -626,8 +626,8 @@
     </div>
 
     <div style="display:flex;gap:10px;margin-bottom:1.25rem;">
-      <button class="btn-start" onclick="showScreen('start-screen')" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);flex:0 0 auto;padding:16px 20px;">&#x2190; Menu</button>
-      <button class="btn-start" onclick="startQuiz()" style="flex:1;">Play Again</button>
+      <button class="btn-start" onclick="SFX.click();showScreen('start-screen')" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);flex:0 0 auto;padding:16px 20px;">&#x2190; Menu</button>
+      <button class="btn-start" onclick="SFX.click();startQuiz()" style="flex:1;">Play Again</button>
     </div>
     <div class="breakdown" id="breakdown"></div>
   </div>
@@ -3775,7 +3775,7 @@ function loadQ() {
     btn.className = 'opt-btn';
     btn.innerHTML = '<span class="opt-btn-inner"><span class="opt-main"><span class="opt-num">' + (i + 1) + '</span><span class="opt-text"><span class="opt-jp">' + escapeHtml(opt.jp) + '</span>' + (showRomaji ? '<span class="opt-rm">' + escapeHtml(opt.rm) + '</span>' : '') + '</span></span></span>';
     btn.dataset.jp = opt.jp;
-    btn.onclick = () => pick(opt, w);
+    btn.onclick = () => { SFX.click(); pick(opt, w); };
     grid.appendChild(btn);
   });
 
@@ -3813,7 +3813,7 @@ function pick(chosen, word) {
   clearInterval(timerInterval);
 
   const ok = chosen.jp === word.jp;
-  if (ok) score++;
+  if (ok) { score++; SFX.correct(); } else { SFX.wrong(); }
 
   results.push({ word, chosen, result: ok ? 'correct' : 'wrong' });
 
@@ -3835,6 +3835,7 @@ function pick(chosen, word) {
 
 function timeout(word) {
   answered = true;
+  SFX.timeout();
   results.push({ word, chosen: null, result: 'timeout' });
 
   document.querySelectorAll('.opt-btn').forEach(btn => {
@@ -3907,6 +3908,7 @@ function showResults() {
     bd.innerHTML = html;
   }
 
+  SFX.complete();
   showScreen('result-screen');
 }
 
@@ -3918,6 +3920,141 @@ function escapeHtml(str) {
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
 }
+
+
+// ═══════════════════════════════════════════════════════════
+// AUDIO ENGINE — elegant synthesised sounds via Web Audio API
+// ═══════════════════════════════════════════════════════════
+const SFX = (() => {
+  let ctx = null;
+
+  function getCtx() {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    // Resume if suspended (browser autoplay policy)
+    if (ctx.state === 'suspended') ctx.resume();
+    return ctx;
+  }
+
+  // Low-level helpers
+  function osc(type, freq, start, dur, gainVal, c) {
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, start);
+    g.gain.setValueAtTime(0, start);
+    g.gain.linearRampToValueAtTime(gainVal, start + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+    o.connect(g);
+    g.connect(c.destination);
+    o.start(start);
+    o.stop(start + dur + 0.05);
+  }
+
+  function oscFreqRamp(type, freqStart, freqEnd, start, dur, gainVal, c) {
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freqStart, start);
+    o.frequency.linearRampToValueAtTime(freqEnd, start + dur);
+    g.gain.setValueAtTime(0, start);
+    g.gain.linearRampToValueAtTime(gainVal, start + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+    o.connect(g);
+    g.connect(c.destination);
+    o.start(start);
+    o.stop(start + dur + 0.05);
+  }
+
+  // ── CLICK — soft, refined tap: a quick sine blip ──────────
+  function click() {
+    try {
+      const c = getCtx();
+      const t = c.currentTime;
+      osc('sine', 880, t, 0.08, 0.06, c);
+      osc('sine', 1320, t + 0.01, 0.06, 0.025, c);
+    } catch(e) {}
+  }
+
+  // ── CORRECT — two-note ascending chime, pentatonic feel ───
+  // Inspired by Japanese temple bell + wind-chime character
+  function correct() {
+    try {
+      const c = getCtx();
+      const t = c.currentTime;
+      // First note: warm sine fundamental
+      osc('sine', 523.25, t,        0.55, 0.18, c);   // C5
+      osc('sine', 1046.5, t,        0.55, 0.07, c);   // C6 overtone
+      // Second note: resolving major third up
+      osc('sine', 659.25, t + 0.14, 0.50, 0.16, c);   // E5
+      osc('sine', 1318.5, t + 0.14, 0.50, 0.06, c);   // E6 overtone
+      // Third note: perfect fifth — feels complete
+      osc('sine', 783.99, t + 0.28, 0.55, 0.13, c);   // G5
+      osc('sine', 1567.98,t + 0.28, 0.55, 0.045, c);  // G6 overtone
+      // Soft shimmer — triangle wave on high note
+      osc('triangle', 2093, t + 0.28, 0.40, 0.025, c); // C7 shimmer
+    } catch(e) {}
+  }
+
+  // ── WRONG — subtle descending tone, not harsh or punishing ─
+  // Two soft sine tones descending — like a gentle "not quite"
+  function wrong() {
+    try {
+      const c = getCtx();
+      const t = c.currentTime;
+      // Gentle descending glide — muted, not aggressive
+      oscFreqRamp('sine', 380, 260, t,        0.30, 0.14, c);
+      oscFreqRamp('sine', 320, 220, t + 0.05, 0.28, 0.10, c);
+      // Soft low thud underneath
+      osc('sine', 100, t, 0.15, 0.08, c);
+    } catch(e) {}
+  }
+
+  // ── TIMEOUT — neutral soft low pulse ──────────────────────
+  function timeout() {
+    try {
+      const c = getCtx();
+      const t = c.currentTime;
+      oscFreqRamp('sine', 340, 260, t, 0.35, 0.10, c);
+      osc('sine', 90, t + 0.05, 0.20, 0.06, c);
+    } catch(e) {}
+  }
+
+  // ── MIC START — soft ascending blip: "I'm listening" ──────
+  function micStart() {
+    try {
+      const c = getCtx();
+      const t = c.currentTime;
+      oscFreqRamp('sine', 660, 880, t, 0.12, 0.07, c);
+    } catch(e) {}
+  }
+
+  // ── MIC SUCCESS — bright short chime ──────────────────────
+  function micCorrect() {
+    try {
+      const c = getCtx();
+      const t = c.currentTime;
+      osc('sine', 698.46, t,        0.40, 0.15, c);   // F5
+      osc('sine', 880,    t + 0.10, 0.38, 0.13, c);   // A5
+      osc('sine', 1046.5, t + 0.20, 0.45, 0.11, c);   // C6
+      osc('triangle', 2093, t + 0.20, 0.35, 0.022, c);
+    } catch(e) {}
+  }
+
+  // ── ROUND COMPLETE — full ascending arpeggio ──────────────
+  function complete() {
+    try {
+      const c = getCtx();
+      const t = c.currentTime;
+      const notes = [523.25, 659.25, 783.99, 1046.5, 1318.5];
+      notes.forEach((freq, i) => {
+        osc('sine', freq, t + i * 0.11, 0.55, 0.14 - i * 0.018, c);
+        osc('triangle', freq * 2, t + i * 0.11, 0.40, 0.025, c);
+      });
+    } catch(e) {}
+  }
+
+  return { click, correct, wrong, timeout, micStart, micCorrect, complete };
+})();
 
 setMode(50);
 setRomaji(false);
@@ -4018,6 +4155,7 @@ function spOnMicTap() {
   spRecog = buildSpRecog();
   if (!spRecog) { spMicReady = false; return; }
 
+  SFX.micStart();
   micBtn.classList.add('listening');
   micBtn.textContent = '\uD83D\uDD34';
   document.getElementById('sp-feedback').textContent = '\uD83D\uDFE1 Listening... say it in Japanese!';
@@ -4061,6 +4199,7 @@ function spOnMicTap() {
     const matched = spWordMatch(finalResult, w);
 
     if (matched) {
+      SFX.micCorrect();
       micBtn.classList.add('success');
       micBtn.textContent = '\u2705';
       document.getElementById('sp-feedback').textContent = '\uD83C\uDF89 Correct! ' + w.jp + ' (' + w.rm + ') = ' + w.en;
@@ -4071,6 +4210,7 @@ function spOnMicTap() {
       setTimeout(() => { spCurrent++; loadSpQ(); }, 1800);
     } else {
       spAttempts++;
+      SFX.wrong();
       micBtn.classList.add('fail');
       setTimeout(() => { micBtn.classList.remove('fail'); }, 500);
       const tries = [
@@ -4183,6 +4323,7 @@ function showSpResults() {
     });
     bd.innerHTML = html;
   }
+  SFX.complete();
   showScreen('result-screen');
 }
 
@@ -4201,3 +4342,4 @@ initSpRecog();
 </script>
 </body>
 </html>
+
